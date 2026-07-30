@@ -795,4 +795,75 @@ function boot(){let sub=document.querySelector('.subtitle');if(sub)sub.textConte
 addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
 })();
 </script>
+
+<style id="v442-style">
+/* V4.4.2 reliable interaction controller */
+.v43-tab,.v44-tile,.v44-act,.v44-province-btn,.v44-map-tools button,.v44-seat,.v44-front-node{position:relative;z-index:2;pointer-events:auto;cursor:pointer}
+.v44-front-node{min-height:18px;padding:0}
+.v442-error{padding:14px;border:1px solid #a9554c;border-radius:14px;background:#241411;color:#f4d5cd;margin:10px 0}
+.v442-error button{margin-top:8px}
+</style>
+<script id="v442-script">
+(()=>{
+'use strict';
+let switching=false;
+function hasGame(){return typeof S!=='undefined'&&!!S}
+function initializeGraphicalState(){
+ if(!hasGame())return;
+ S.v41=S.v41||{mapVisits:0,cityInfluence:{},routes:[],intel:{},lastProvince:'Italia'};
+ const names=typeof provinces!=='undefined'?provinces:Object.keys(S.provinces||{});
+ names.forEach(n=>{
+  if(S.v41.cityInfluence[n]==null)S.v41.cityInfluence[n]=0;
+  if(!S.v41.intel[n])S.v41.intel[n]={surveyed:false,rumor:'No verified political report has been filed.'};
+ });
+}
+function safeRender(){
+ if(!hasGame())return;
+ initializeGraphicalState();
+ try{render()}catch(err){
+  console.error('Graphical screen render failed:',err);
+  const view=document.getElementById('view');
+  if(view)view.innerHTML=`<div class="v442-error"><b>This screen encountered a rendering error.</b><div class="small">${String(err&&err.message||err)}</div><button class="btn" type="button" data-v442-home>Return to Capital</button></div>`;
+ }
+}
+window.tab=function(name){
+ if(!hasGame()||switching)return;
+ switching=true;
+ currentTab=name;
+ try{safeRender()}finally{switching=false}
+};
+function runNamed(name,args=[]){
+ const fn=window[name];
+ if(typeof fn!=='function'){toast(`${name} is unavailable on this save.`);return}
+ try{fn(...args)}catch(err){console.error(name,err);toast('That action could not be completed.')}
+}
+function bindDirectControls(root=document){
+ root.querySelectorAll('.v43-tab').forEach(btn=>{
+  if(btn.dataset.v442Bound)return;btn.dataset.v442Bound='1';
+  const label=btn.querySelector('.lbl')?.textContent?.trim();
+  const match={Capital:'Capital',Senate:'Senate',Council:'Imperial Council',Map:'Provinces',Campaign:'Campaign',War:'War Room',Diplomacy:'Diplomacy',Estate:'Estate',Research:'Research',People:'People',Chronicle:'Chronicle'}[label];
+  if(match)btn.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();window.tab(match)},true);
+ });
+ root.querySelectorAll('[data-v442-home]').forEach(btn=>btn.addEventListener('click',()=>window.tab('Capital')));
+}
+const actionMap={
+ Forum:()=>runNamed('speech'),Archives:()=>runNamed('train',['learning']),Praetorium:()=>runNamed('train',['strength']),Salon:()=>runNamed('salon'),Inquiry:()=>runNamed('investigate'),Subura:()=>runNamed('fight'),Palace:()=>runNamed('palace'),Temple:()=>runNamed('temple'),
+ 'Build Coalition':()=>runNamed('v4Lobby',['support']),'Disrupt Rivals':()=>runNamed('v4Lobby',['oppose']),'Force Vote':()=>runNamed('v4ForceVote'),Committee:()=>runNamed('committee'),
+ Rotate:(b)=>runNamed('v4Front',[Math.max(0,Array.from(document.querySelectorAll('.v44-front-card')).indexOf(b.closest('.v44-front-card'))),'rotate']),Fortify:(b)=>runNamed('v4Front',[Math.max(0,Array.from(document.querySelectorAll('.v44-front-card')).indexOf(b.closest('.v44-front-card'))),'fortify']),Offensive:(b)=>runNamed('v4Front',[Math.max(0,Array.from(document.querySelectorAll('.v44-front-card')).indexOf(b.closest('.v44-front-card'))),'offensive'])
+};
+function bindTiles(root=document){
+ root.querySelectorAll('.v44-tile').forEach(btn=>{
+  if(btn.dataset.v442Tile)return;btn.dataset.v442Tile='1';
+  const label=btn.querySelector('b')?.textContent?.trim();
+  if(actionMap[label])btn.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();actionMap[label](btn)},true);
+ });
+}
+const observer=new MutationObserver(()=>{bindDirectControls();bindTiles()});
+observer.observe(document.documentElement,{subtree:true,childList:true});
+const originalRender=window.render;
+window.render=function(){initializeGraphicalState();try{return originalRender()}finally{requestAnimationFrame(()=>{bindDirectControls();bindTiles()})}};
+function boot(){initializeGraphicalState();bindDirectControls();bindTiles();let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Graphical Command • Version 4.4.2 — Menu & Screen Repair'}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
+})();
+</script>
 </body></html>
