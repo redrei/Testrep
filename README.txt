@@ -8,3 +8,7 @@ Existing v2-v4 saves migrate automatically.
 
 
 Version 4.2 adds a more realistic desktop GPU renderer with atmospheric shaders, richer procedural lighting, more expressive animated characters, and deeper motion effects.
+
+Version 4.3 focuses on usability: graphical tab menus, icon-driven action buttons, a redesigned provincial atlas, and a visual province command panel.
+
+Version 4.4 adds a stronger graphical UI, aligned screen layouts, a redesigned Senate chamber and war room, a persistent HUD, and a more geographically recognizable map of the Imperium.
