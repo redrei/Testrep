@@ -1,8 +1,8 @@
 {
-  "id": "./",
-  "name": "Imperium Aeternum III",
-  "short_name": "Imperium III",
-  "description": "A grand-strategy political RPG in an eternal modern Roman Empire, with code-generated graphics.",
+  "id": "./?v=4.0",
+  "name": "Imperium Aeternum IV: Interactive Imperium — Living Imperium",
+  "short_name": "Imperium IV",
+  "description": "A code-rendered political strategy RPG in an eternal modern Roman Empire.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
