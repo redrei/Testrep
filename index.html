@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#16110d" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Imperium" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<meta name="format-detection" content="telephone=no" />
+<title>Imperium Aeternum</title>
+<style>
+  :root{
+    --bg:#16110d;--panel:#241a14;--panel2:#302219;--gold:#d9ae61;--cream:#f3e3c2;
+    --red:#8d2f2f;--green:#4e7b52;--blue:#496b89;--muted:#bba989;--line:#5c4634;
+  }
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#342318 0,#16110d 48%,#0d0a08 100%);color:var(--cream);font-family:Georgia,serif;min-height:100vh}
+  button,input,select{font:inherit} button{cursor:pointer}
+  #app{max-width:1180px;margin:auto;padding:16px}
+  .title{font-size:34px;letter-spacing:4px;color:var(--gold);text-align:center;text-shadow:0 2px 0 #000;margin:8px 0 2px}
+  .subtitle{text-align:center;color:var(--muted);margin-bottom:14px}
+  .screen{display:none}.screen.active{display:block}
+  .panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);box-shadow:0 8px 25px #0008;padding:16px;border-radius:8px}
+  .grid{display:grid;grid-template-columns:260px 1fr 260px;gap:12px}.col{display:flex;flex-direction:column;gap:12px}
+  h2,h3{color:var(--gold);margin:.2em 0 .55em} h2{border-bottom:1px solid var(--line);padding-bottom:7px}
+  .stat{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted #6d5742}.small{font-size:13px;color:var(--muted)}
+  .bar{height:13px;border:1px solid #7c6650;background:#0b0908;border-radius:3px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#943838,#d66b4e)}.fill.stamina{background:linear-gradient(90deg,#315c38,#74a65e)}.fill.xp{background:linear-gradient(90deg,#66521e,#d9ae61)}
+  .actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.action,.choice,.district,.combat-btn{background:#3a291e;color:var(--cream);border:1px solid #806344;border-radius:5px;padding:10px;transition:.15s}.action:hover,.choice:hover,.district:hover,.combat-btn:hover{background:#543a27;border-color:var(--gold);transform:translateY(-1px)}
+  .primary{background:#7a302d}.primary:hover{background:#9b3e38}.good{background:#365f3d}.blue{background:#35566f}.disabled{opacity:.45;pointer-events:none}
+  #log{height:285px;overflow:auto;background:#110d0a;border:1px solid var(--line);padding:12px;line-height:1.45}.log-entry{padding:5px 0;border-bottom:1px solid #2e241c}.gold{color:var(--gold)}.bad-text{color:#e58d7f}.good-text{color:#9fd08e}
+  .districts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.district{min-height:70px;text-align:left}.district b{display:block;color:var(--gold);font-size:16px}.district span{font-size:12px;color:var(--muted)}
+  .modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.modal-card{max-width:680px;width:100%;max-height:90vh;overflow:auto;background:linear-gradient(180deg,#33241a,#1d1510);border:2px solid var(--gold);border-radius:8px;padding:20px;box-shadow:0 18px 70px #000}
+  .choices{display:grid;gap:8px;margin-top:15px}.enemy{display:grid;grid-template-columns:1fr 1fr;gap:15px}.portrait{height:150px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:70px;background:#120d0a}
+  .creation{max-width:800px;margin:auto}.origins{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.origin{padding:12px;border:1px solid var(--line);background:#2d2018;border-radius:6px}.origin.selected{outline:2px solid var(--gold)}
+  .footer{text-align:center;color:#806d59;font-size:12px;margin-top:12px}
+  .startup-error{margin-top:12px;padding:10px;border:1px solid #a84b43;border-radius:8px;background:#461d1b;color:#ffd5cf;display:none}.tag{display:inline-block;padding:2px 7px;border:1px solid #725a42;border-radius:999px;font-size:12px;color:var(--muted);margin:2px}
+  .ios-end-button{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 8px 24px #000a}
+  button{-webkit-tap-highlight-color:transparent;touch-action:manipulation;min-height:44px}
+  input{font-size:16px;border-radius:8px}
+  body{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+  .panel,.modal-card{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  @media(max-width:850px){
+    body{background-attachment:fixed;padding-top:env(safe-area-inset-top);padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+    #app{padding:10px 10px 0;max-width:600px}
+    .title{font-size:clamp(24px,7vw,32px);letter-spacing:2px;margin-top:4px}
+    .subtitle{font-size:13px;margin-bottom:10px}
+    .grid{display:flex;flex-direction:column;gap:10px}
+    .col{display:contents}
+    .col.left .panel:first-child{order:1}
+    .grid>.col:nth-child(2)>.panel:nth-child(1){order:2}
+    .grid>.col:nth-child(2)>.panel:nth-child(2){order:3}
+    .grid>.col:nth-child(2)>.panel:nth-child(3){order:4}
+    .col.right .panel:nth-child(1){order:5}
+    .col.right .panel:nth-child(2){order:6}
+    .col.right .panel:nth-child(3){order:7}
+    .col.left .panel:nth-child(2){order:8}
+    .col.left .panel:nth-child(3){order:9}
+    .panel{padding:14px;border-radius:14px;box-shadow:0 5px 18px #0007}
+    h2{font-size:22px} h3{font-size:18px}
+    .origins{grid-template-columns:1fr}.origin{min-height:78px;padding:14px;border-radius:12px}
+    .origin.selected{outline-offset:-2px}
+    .districts{display:flex;overflow-x:auto;gap:9px;margin:12px -4px 0;padding:2px 4px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+    .district{flex:0 0 78%;min-height:84px;border-radius:12px;scroll-snap-align:start;padding:12px}
+    .actions{grid-template-columns:1fr;gap:9px}
+    .action,.choice,.combat-btn{padding:13px 14px;border-radius:11px;font-weight:600}
+    #log{height:230px;border-radius:10px;-webkit-overflow-scrolling:touch}
+    .modal{align-items:flex-end;padding:0;background:#0009}
+    .modal-card{max-height:88dvh;border-width:1px 0 0;border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));overflow:auto;-webkit-overflow-scrolling:touch}
+    .modal-card:before{content:'';display:block;width:38px;height:5px;border-radius:99px;background:#8e7c68;margin:-8px auto 14px}
+    .enemy{grid-template-columns:1fr 1fr;gap:9px}.portrait{height:112px;font-size:52px;border-radius:10px}
+    .choices{gap:10px}
+    .ios-end-button{left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));width:calc(100% - 20px);height:54px;border-radius:14px;font-size:17px;border-color:#b67462;background:linear-gradient(180deg,#a4443f,#722a28);box-shadow:0 8px 25px #000c}
+    .footer{padding-bottom:12px}
+  }
+  @media(max-width:380px){.district{flex-basis:88%}.title{font-size:23px}.panel{padding:12px}.enemy{grid-template-columns:1fr}.portrait{height:80px}}
+  @media(hover:none){.action:hover,.choice:hover,.district:hover,.combat-btn:hover{transform:none}.action:active,.choice:active,.district:active,.combat-btn:active{filter:brightness(1.18);transform:scale(.985)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="title">IMPERIUM AETERNUM</div>
+  <div class="subtitle">A political RPG in the eternal Roman Empire</div>
+
+  <section id="creation" class="screen active creation panel">
+    <h2>Create Your Senator</h2>
+    <label>Name</label>
+    <input id="nameInput" value="Marcus Valerius" style="width:100%;padding:10px;background:#160f0b;color:#fff;border:1px solid var(--line);margin:6px 0 14px">
+    <h3>Origin</h3>
+    <div class="origins" id="originList"></div>
+    <button id="startGameButton" type="button" class="action primary" style="width:100%;margin-top:14px">Enter the Senate</button>
+    <div id="startupError" class="startup-error" role="alert"></div>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="grid">
+      <div class="col left">
+        <div class="panel">
+          <h3 id="playerName">Senator</h3>
+          <div class="small" id="originText"></div>
+          <div style="margin-top:10px">Health <span id="hpText"></span></div><div class="bar"><div id="hpBar" class="fill"></div></div>
+          <div style="margin-top:7px">Energy <span id="energyText"></span></div><div class="bar"><div id="energyBar" class="fill stamina"></div></div>
+          <div style="margin-top:7px">Experience <span id="xpText"></span></div><div class="bar"><div id="xpBar" class="fill xp"></div></div>
+          <div id="stats"></div>
+        </div>
+        <div class="panel">
+          <h3>Political Standing</h3>
+          <div class="stat"><span>Senate Influence</span><b id="influence"></b></div>
+          <div class="stat"><span>Popular Support</span><b id="popularity"></b></div>
+          <div class="stat"><span>Imperial Favor</span><b id="favor"></b></div>
+          <div class="stat"><span>Denarii</span><b id="money"></b></div>
+          <div class="stat"><span>Day</span><b id="day"></b></div>
+        </div>
+        <div class="panel">
+          <button class="action" style="width:100%" onclick="saveGame()">Save Game</button>
+          <button class="action" style="width:100%;margin-top:7px" onclick="loadGame()">Load Game</button>
+          <button class="action" style="width:100%;margin-top:7px" onclick="restartGame()">New Game</button>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="panel">
+          <h2 id="locationTitle">Senate Hill</h2>
+          <div id="locationDescription" class="small"></div>
+          <div class="districts" id="districts"></div>
+        </div>
+        <div class="panel">
+          <h3>Actions</h3>
+          <div class="actions" id="actions"></div>
+        </div>
+        <div class="panel">
+          <h3>Chronicle</h3>
+          <div id="log"></div>
+        </div>
+      </div>
+
+      <div class="col right">
+        <div class="panel">
+          <h3>Active Objective</h3>
+          <div id="objective"></div>
+        </div>
+        <div class="panel">
+          <h3>Faction Relations</h3>
+          <div id="factions"></div>
+        </div>
+        <div class="panel">
+          <h3>Inventory</h3>
+          <div id="inventory"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="footer">Single-file browser edition • Progress saves in local storage</div>
+</div>
+
+<div id="modal" class="modal"><div class="modal-card" id="modalCard"></div></div>
+
+<script>
+const origins={
+  patrician:{name:'Patrician Heir',desc:'Old blood, old debts, old enemies.',bonus:{charisma:2,rhetoric:1,money:300,influence:12}},
+  military:{name:'Military Family',desc:'Raised among officers and standards.',bonus:{strength:2,strategy:2,favor:8}},
+  merchant:{name:'Merchant Dynasty',desc:'Coin opens doors that virtue cannot.',bonus:{learning:1,charisma:1,money:650}},
+  provincial:{name:'Provincial Noble',desc:'An outsider with a broad coalition.',bonus:{strategy:1,rhetoric:1,popularity:12}},
+  freedman:{name:"Freedman's Descendant",desc:'You inherited no prestige—only hunger.',bonus:{learning:2,rhetoric:2,popularity:7}},
+  priestly:{name:'Priestly Bloodline',desc:'The temples whisper your family name.',bonus:{charisma:1,learning:2,favor:12}}
+};
+let selectedOrigin='patrician';
+let state;
+const baseState=()=>({name:'',origin:'',level:1,xp:0,xpNext:100,hp:100,maxHp:100,energy:8,maxEnergy:8,
+ strength:4,endurance:4,charisma:4,rhetoric:4,strategy:4,learning:4,
+ influence:20,popularity:20,favor:15,money:500,day:1,location:'Senate Hill',
+ factions:{Traditionalists:0,Imperialists:0,Merchants:0,Populists:0,Technocrats:0},
+ inventory:['Ceremonial Gladius','Senatorial Toga'],quest:0,questProgress:0,billsPassed:0,enemiesDefeated:0,flags:{},combat:null});
+
+const locations={
+ 'Senate Hill':{desc:'The marble heart of imperial politics. Every smile conceals a calculation.',actions:['Attend Senate Session','Lobby a Faction','Research Legislation','Deliver a Speech']},
+ 'Forum Maximus':{desc:'Commerce, propaganda and public spectacle beneath neon-lit colonnades.',actions:['Campaign in the Forum','Trade on the Exchange','Investigate Rumors','Rest at a Bathhouse']},
+ 'Military District':{desc:'Barracks, drone hangars and monuments to ten thousand victories.',actions:['Train with the Guard','Request Legion Support','Patrol the District','Buy Equipment']},
+ 'Subura':{desc:'A maze of tenements, clubs, black markets and dangerous loyalties.',actions:['Meet an Informant','Disrupt a Gang','Gamble','Visit the Black Market']},
+ 'Imperial Palace':{desc:'The Emperor watches the Empire through glass, marble and layers of spies.',actions:['Petition the Emperor','Court the Praetorians','Attend a Banquet','Study Court Records']},
+ 'Vaticanus':{desc:'Ancient temples stand beside quantum observatories and state archives.',actions:['Consult the Augurs','Donate to the Temples','Explore the Archives','Meditate']}
+};
+
+function initOrigins(){
+ const box=document.getElementById('originList');box.innerHTML='';
+ Object.entries(origins).forEach(([k,o])=>{const d=document.createElement('div');d.className='origin'+(k===selectedOrigin?' selected':'');d.innerHTML=`<b>${o.name}</b><div class="small">${o.desc}</div>`;d.onclick=()=>{selectedOrigin=k;initOrigins()};box.appendChild(d)});
+}
+function startGame(){
+ if(state)return;
+ state=baseState();state.name=document.getElementById('nameInput').value.trim()||'Marcus Valerius';state.origin=selectedOrigin;
+ const b=origins[selectedOrigin].bonus;Object.entries(b).forEach(([k,v])=>state[k]=(state[k]||0)+v);
+ document.getElementById('creation').classList.remove('active');document.getElementById('game').classList.add('active');
+ log(`On Day I, <span class="gold">${state.name}</span> takes a seat in the Imperial Senate.`);log('Your first challenge: build enough influence to sponsor a public works bill.');render();
+}
+function render(){
+ document.getElementById('playerName').textContent=state.name;document.getElementById('originText').textContent=origins[state.origin].name+' • Level '+state.level;
+ setBar('hp',state.hp,state.maxHp);setBar('energy',state.energy,state.maxEnergy);setBar('xp',state.xp,state.xpNext);
+ document.getElementById('stats').innerHTML=['strength','endurance','charisma','rhetoric','strategy','learning'].map(s=>`<div class="stat"><span>${cap(s)}</span><b>${state[s]}</b></div>`).join('');
+ ['influence','popularity','favor','money','day'].forEach(id=>document.getElementById(id).textContent=id==='money'?state[id].toLocaleString():state[id]);
+ document.getElementById('locationTitle').textContent=state.location;document.getElementById('locationDescription').textContent=locations[state.location].desc;
+ document.getElementById('districts').innerHTML=Object.keys(locations).map(l=>`<button class="district ${l===state.location?'blue':''}" onclick="travel('${l}')"><b>${l}</b><span>${locations[l].desc.slice(0,55)}...</span></button>`).join('');
+ document.getElementById('actions').innerHTML=locations[state.location].actions.map(a=>`<button class="action" onclick="doAction('${a.split("'").join("\\'")}')">${a}</button>`).join('');
+ document.getElementById('factions').innerHTML=Object.entries(state.factions).map(([f,v])=>`<div class="stat"><span>${f}</span><b class="${v>=10?'good-text':v<=-10?'bad-text':''}">${v>=0?'+':''}${v}</b></div>`).join('');
+ document.getElementById('inventory').innerHTML=state.inventory.length?state.inventory.map(x=>`<span class="tag">${x}</span>`).join(''):'<span class="small">Empty</span>';
+ const qs=[
+  'Gain 35 influence and sponsor the Transit Renewal Act.',
+  'Investigate corruption in the Subura and defeat the gang enforcer.',
+  'Secure either Imperial favor 35 or Popular support 50.',
+  'Pass the Constitutional Settlement and decide the future of Rome.'
+ ]; document.getElementById('objective').innerHTML=`<b>${qs[Math.min(state.quest,3)]}</b><div class="small" style="margin-top:8px">Progress changes through exploration, debate and combat.</div>`;
+ checkQuest();
+}
+function setBar(id,v,max){document.getElementById(id+'Text').textContent=`${v}/${max}`;document.getElementById(id+'Bar').style.width=Math.max(0,Math.min(100,v/max*100))+'%'}
+function cap(s){return s[0].toUpperCase()+s.slice(1)}
+function log(t){const l=document.getElementById('log');const d=document.createElement('div');d.className='log-entry';d.innerHTML=t;l.prepend(d)}
+function travel(loc){if(state.energy<1)return log('<span class="bad-text">You are too exhausted to travel.</span>');state.energy--;state.location=loc;log(`You travel to <span class="gold">${loc}</span>.`);randomEvent();render()}
+function spendEnergy(n=1){if(state.energy<n){log('<span class="bad-text">Not enough energy. Rest or end the day.</span>');return false}state.energy-=n;return true}
+function gainXp(n){state.xp+=n;while(state.xp>=state.xpNext){state.xp-=state.xpNext;state.level++;state.xpNext=Math.floor(state.xpNext*1.35);state.maxHp+=12;state.hp=state.maxHp;state.maxEnergy++;state.energy=state.maxEnergy;showLevelUp()} }
+function showLevelUp(){showModal(`<h2>Level ${state.level}</h2><p>Your name carries farther through the marble halls.</p><div class="choices">${['charisma','rhetoric','strategy','learning','strength','endurance'].map(s=>`<button class="choice" onclick="raiseStat('${s}')">Increase ${cap(s)}</button>`).join('')}</div>`)}
+function raiseStat(s){state[s]++;closeModal();log(`<span class="good-text">${cap(s)} increased.</span>`);render()}
+function doAction(a){
+ const handlers={
+ 'Attend Senate Session':senateSession,'Lobby a Faction':lobby,'Research Legislation':()=>skillCheck('learning',7,'You uncover a decisive legal precedent.',()=>{state.influence+=7;gainXp(18)},'The archives yield nothing useful.'),
+ 'Deliver a Speech':()=>skillCheck('rhetoric',7,'The chamber echoes with applause.',()=>{state.influence+=5;state.popularity+=4;gainXp(20)},'Your speech is met with theatrical coughing.'),
+ 'Campaign in the Forum':()=>skillCheck('charisma',7,'Citizens chant your name.',()=>{state.popularity+=8;state.influence+=2;gainXp(18)},'The crowd drifts toward a food stall.'),
+ 'Trade on the Exchange':()=>{if(!spendEnergy())return;let r=Math.floor(Math.random()*260)-70+state.learning*8;state.money=Math.max(0,state.money+r);log(r>=0?`Your trades earn <span class="good-text">${r} denarii</span>.`:`A market reversal costs <span class="bad-text">${-r} denarii</span>.`);render()},
+ 'Investigate Rumors':()=>skillCheck('learning',6,'You trace a bribery network into the Subura.',()=>{state.influence+=4;state.questProgress++;gainXp(15)},'The trail goes cold.'),
+ 'Rest at a Bathhouse':()=>{if(state.money<40)return log('You cannot afford the baths.');state.money-=40;state.energy=Math.min(state.maxEnergy,state.energy+4);state.hp=Math.min(state.maxHp,state.hp+25);log('Steam, oil and gossip restore you.');render()},
+ 'Train with the Guard':()=>skillCheck('strength',6,'The legionaries salute your discipline.',()=>{state.strength++;gainXp(18)},'A centurion sends you home bruised.'),
+ 'Request Legion Support':()=>skillCheck('strategy',8,'A cohort quietly pledges support.',()=>{state.favor+=8;state.factions.Imperialists+=5;gainXp(24)},'The generals remain noncommittal.'),
+ 'Patrol the District':()=>startCombat('Street Saboteur',70,9,65),
+ 'Buy Equipment':shop,
+ 'Meet an Informant':()=>{if(state.money<90)return log('The informant refuses to work for promises.');state.money-=90;state.influence+=8;state.questProgress++;log('An informant sells you names, ledgers and one dangerous address.');gainXp(20);render()},
+ 'Disrupt a Gang':()=>startCombat('Subura Enforcer',95,12,110),
+ 'Gamble':()=>{if(state.money<50)return log('You need 50 denarii.');state.money-=50;const win=Math.random()<.44;if(win){state.money+=140;log('<span class="good-text">Fortuna smiles. You win 90 denarii.</span>')}else log('<span class="bad-text">The dice betray you.</span>');render()},
+ 'Visit the Black Market':blackMarket,
+ 'Petition the Emperor':()=>skillCheck('charisma',9,'The Emperor grants you a private audience.',()=>{state.favor+=10;state.influence+=4;gainXp(28)},'You wait beneath a mosaic for six hours and are dismissed.'),
+ 'Court the Praetorians':()=>{if(state.money<150)return log('Praetorian friendship is expensive.');state.money-=150;state.favor+=8;state.factions.Imperialists+=6;log('A generous donation secures guarded smiles.');render()},
+ 'Attend a Banquet':()=>{if(state.money<100)return log('You cannot afford the expected gift.');state.money-=100;state.influence+=6;state.energy=Math.max(0,state.energy-1);log('Wine and whispered bargains improve your standing.');gainXp(15);render()},
+ 'Study Court Records':()=>skillCheck('learning',8,'You discover a forgotten imperial decree.',()=>{state.influence+=6;state.favor+=3;gainXp(22)},'The sealed records remain sealed.'),
+ 'Consult the Augurs':()=>{if(state.money<60)return log('The augurs expect an offering.');state.money-=60;const stats=['rhetoric','charisma','strategy','learning'];const s=stats[Math.floor(Math.random()*stats.length)];state[s]++;log(`The omens sharpen your <span class="gold">${s}</span>.`);render()},
+ 'Donate to the Temples':()=>{if(state.money<120)return log('You lack the funds.');state.money-=120;state.popularity+=7;state.favor+=3;log('Your donation is announced across the civic networks.');render()},
+ 'Explore the Archives':()=>skillCheck('learning',9,'You find references to the Aeternum Engine beneath Rome.',()=>{state.influence+=10;state.flags.engine=true;gainXp(35)},'Dust and dead ends consume the day.'),
+ 'Meditate':()=>{if(!spendEnergy())return;state.hp=Math.min(state.maxHp,state.hp+15);state.influence+=1;log('You contemplate duty, ambition and the price of both.');render()}
+ };handlers[a]();
+}
+function skillCheck(stat,difficulty,success,fn,fail){if(!spendEnergy())return;const roll=Math.ceil(Math.random()*10)+state[stat];if(roll>=difficulty+5){log(`<span class="good-text">${success}</span>`);fn()}else log(`<span class="bad-text">${fail}</span> (${cap(stat)} check: ${roll})`);render()}
+function lobby(){
+ if(!spendEnergy())return;showModal(`<h2>Lobby a Faction</h2><p>Choose where to spend your political capital.</p><div class="choices">${Object.keys(state.factions).map(f=>`<button class="choice" onclick="chooseLobby('${f}')">${f}</button>`).join('')}</div>`)}
+function chooseLobby(f){const stat=f==='Merchants'?'learning':f==='Populists'?'charisma':f==='Technocrats'?'learning':f==='Imperialists'?'strategy':'rhetoric';const roll=Math.ceil(Math.random()*10)+state[stat];if(roll>=11){state.factions[f]+=8;state.influence+=4;log(`${f} leaders accept your proposal.`);gainXp(16)}else{state.factions[f]-=3;log(`<span class="bad-text">Your meeting with the ${f} goes poorly.</span>`)}closeModal();render()}
+function senateSession(){
+ if(!spendEnergy(2))return;
+ const bills=[
+ {title:'Transit Renewal Act',text:'Fund maglev aqueduct corridors across the capital.',yes:{influence:8,popularity:5,factions:{Technocrats:6,Merchants:2,Traditionalists:-3}},no:{factions:{Traditionalists:4,Technocrats:-4}}},
+ {title:'Provincial Citizenship Bill',text:'Expand full citizenship to long-term provincial residents.',yes:{popularity:9,factions:{Populists:7,Traditionalists:-6}},no:{favor:3,factions:{Traditionalists:5,Populists:-6}}},
+ {title:'Autonomous Legion Oversight',text:'Place military drones under civilian Senate review.',yes:{influence:7,factions:{Technocrats:4,Imperialists:-7}},no:{favor:7,factions:{Imperialists:6,Populists:-3}}}
+ ];const b=bills[Math.floor(Math.random()*bills.length)];
+ showModal(`<h2>${b.title}</h2><p>${b.text}</p><p class="small">Your vote and speech will shape both policy and alliances.</p><div class="choices"><button class="choice good" onclick='resolveBill(${JSON.stringify(b)},true)'>Support and Speak</button><button class="choice primary" onclick='resolveBill(${JSON.stringify(b)},false)'>Oppose the Bill</button></div>`)
+}
+function resolveBill(b,yes){const outcome=yes?b.yes:b.no;const roll=Math.ceil(Math.random()*20)+state.rhetoric+Math.floor(state.influence/10);const passed=roll>=18;Object.entries(outcome).forEach(([k,v])=>{if(k==='factions')Object.entries(v).forEach(([f,n])=>state.factions[f]+=n);else state[k]+=v});if(passed){state.billsPassed++;state.influence+=5;gainXp(35);log(`<span class="good-text">${b.title} ${yes?'passes':'is defeated'} after your intervention.</span>`)}else{state.influence=Math.max(0,state.influence-3);log(`<span class="bad-text">The chamber rejects your position on ${b.title}.</span>`)}closeModal();render()}
+function shop(){showModal(`<h2>Military Exchange</h2><div class="choices"><button class="choice" onclick="buy('Carbon Lorica',220,'armor')">Carbon Lorica — 220</button><button class="choice" onclick="buy('Monomolecular Gladius',320,'weapon')">Monomolecular Gladius — 320</button><button class="choice" onclick="buy('Tactical Visor',260,'visor')">Tactical Visor — 260</button></div>`)}
+function blackMarket(){showModal(`<h2>Black Market</h2><div class="choices"><button class="choice" onclick="buy('Encrypted Dossier',180,'dossier')">Encrypted Dossier — 180</button><button class="choice" onclick="buy('Combat Stimulant',120,'stim')">Combat Stimulant — 120</button></div>`)}
+function buy(name,cost,type){if(state.money<cost)return;state.money-=cost;if(!state.inventory.includes(name))state.inventory.push(name);if(type==='armor')state.maxHp+=25;if(type==='weapon')state.strength+=2;if(type==='visor')state.strategy+=2;if(type==='dossier')state.influence+=10;if(type==='stim'){state.hp=state.maxHp;state.energy=state.maxEnergy}log(`You acquire <span class="gold">${name}</span>.`);closeModal();render()}
+function startCombat(name,hp,damage,reward){if(!spendEnergy())return;state.combat={name,hp,maxHp:hp,damage,reward,guard:false};renderCombat()}
+function renderCombat(){const c=state.combat;showModal(`<h2>Combat: ${c.name}</h2><div class="enemy"><div><div class="portrait">⚔</div><p>${state.name}</p><div class="bar"><div class="fill" style="width:${state.hp/state.maxHp*100}%"></div></div></div><div><div class="portrait">☠</div><p>${c.name}</p><div class="bar"><div class="fill" style="width:${c.hp/c.maxHp*100}%"></div></div></div></div><div class="choices"><button class="combat-btn" onclick="combatMove('strike')">Gladius Strike</button><button class="combat-btn" onclick="combatMove('speech')">Commanding Speech</button><button class="combat-btn" onclick="combatMove('guard')">Raise Scutum</button><button class="combat-btn" onclick="combatMove('drone')">Tactical Drone</button></div>`)}
+function combatMove(m){const c=state.combat;let dmg=0;if(m==='strike')dmg=7+state.strength+Math.floor(Math.random()*8);if(m==='speech')dmg=4+state.rhetoric+Math.floor(Math.random()*7);if(m==='guard'){c.guard=true;state.hp=Math.min(state.maxHp,state.hp+4);log('You brace behind your scutum.')}if(m==='drone')dmg=state.inventory.includes('Tactical Visor')?15+state.strategy:7+state.strategy;if(dmg){c.hp-=dmg;log(`You deal ${dmg} damage to ${c.name}.`)}if(c.hp<=0){state.money+=c.reward;state.influence+=4;state.enemiesDefeated++;state.questProgress++;gainXp(45);log(`<span class="good-text">You defeat ${c.name} and gain ${c.reward} denarii.</span>`);state.combat=null;closeModal();render();return}let incoming=Math.max(1,c.damage+Math.floor(Math.random()*6)-(c.guard?Math.floor(state.endurance*1.5):Math.floor(state.endurance/2)));c.guard=false;state.hp-=incoming;log(`<span class="bad-text">${c.name} deals ${incoming} damage.</span>`);if(state.hp<=0){state.hp=Math.ceil(state.maxHp*.45);state.money=Math.max(0,state.money-100);state.energy=0;state.combat=null;closeModal();log('<span class="bad-text">You awaken in a military clinic, poorer but alive.</span>');render();return}renderCombat()}
+function randomEvent(){if(Math.random()>.18)return;const events=[()=>{state.money+=80;log('A grateful client sends you 80 denarii.')},()=>{state.popularity+=3;log('A street broadcast praises your recent conduct.')},()=>{state.influence=Math.max(0,state.influence-2);log('<span class="bad-text">A rival leaks an unflattering story.</span>')},()=>{state.energy=Math.max(0,state.energy-1);log('A transit shutdown delays your entourage.')}];events[Math.floor(Math.random()*events.length)]()}
+function checkQuest(){
+ if(state.quest===0&&state.influence>=35){state.quest=1;state.money+=250;state.inventory.push('Transit Act Seal');log('<span class="gold">Quest complete:</span> your first major bill establishes you as a serious senator.');showModal(`<h2>Act I Complete</h2><p>Your Transit Renewal Act passes. That night, an anonymous courier delivers evidence of a corruption ring operating from the Subura.</p><button class="choice" onclick="closeModal()">Continue</button>`)}
+ else if(state.quest===1&&state.enemiesDefeated>=1&&state.questProgress>=2){state.quest=2;state.influence+=15;log('<span class="gold">Quest complete:</span> the Subura conspiracy points toward the highest offices of state.')}
+ else if(state.quest===2&&(state.favor>=35||state.popularity>=50)){state.quest=3;log('<span class="gold">Final quest unlocked:</span> the Constitutional Settlement.');setTimeout(finale,300)}
+}
+function finale(){showModal(`<h2>The Constitutional Settlement</h2><p>The Emperor, generals and faction leaders gather. Rome must choose what it will become.</p><div class="choices"><button class="choice good" onclick="ending('Republic')">Limit the Emperor and restore a true republic</button><button class="choice primary" onclick="ending('Emperor')">Claim emergency powers and become Emperor</button><button class="choice blue" onclick="ending('Eternal')">Create a balanced imperial constitution</button></div>`)}
+function ending(type){let text=type==='Republic'?'You break two millennia of concentrated power. Rome becomes a federal republic, turbulent but free.':type==='Emperor'?'Legions fill the avenues as the Senate names you Imperator. Order returns—at the cost of liberty.':'You bind Crown, Senate and Provinces into a durable constitutional order. The Empire survives by consent rather than miracle.';document.getElementById('modalCard').innerHTML=`<h2>${type} Ending</h2><p>${text}</p><p class="gold">Final score: ${state.influence+state.popularity+state.favor+state.level*20+state.billsPassed*15}</p><button class="choice" onclick="closeModal()">Continue Playing</button>`;state.flags.ended=type;saveGame()}
+function showModal(html){document.getElementById('modalCard').innerHTML=html;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function endDay(){state.day++;state.energy=state.maxEnergy;state.hp=Math.min(state.maxHp,state.hp+18);log(`Day ${state.day} begins.`);render()}
+function saveGame(){localStorage.setItem('imperiumAeternumSave',JSON.stringify(state));log('<span class="good-text">Game saved.</span>')}
+function loadGame(){const s=localStorage.getItem('imperiumAeternumSave');if(!s)return alert('No save found.');state=JSON.parse(s);document.getElementById('creation').classList.remove('active');document.getElementById('game').classList.add('active');log('Saved game loaded.');render()}
+function restartGame(){if(confirm('Start a new game?')){localStorage.removeItem('imperiumAeternumSave');location.reload()}}
+function showStartupError(error){
+ const box=document.getElementById('startupError');
+ if(!box)return;
+ box.style.display='block';
+ box.textContent='The game could not start: '+(error&&error.message?error.message:String(error));
+}
+
+try{
+ initOrigins();
+ const startButton=document.getElementById('startGameButton');
+ const launchGame=function(event){
+   if(event){event.preventDefault();event.stopPropagation();}
+   try{startGame();endBtn.style.display='block'}catch(error){console.error(error);showStartupError(error)}
+ };
+ startButton.addEventListener('click',launchGame,false);
+ startButton.addEventListener('touchend',launchGame,{passive:false});
+}catch(error){console.error(error);showStartupError(error)}
+
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key.toLowerCase()==='e'&&state)endDay()});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('touchmove',e=>{if(e.scale&&e.scale!==1)e.preventDefault()},{passive:false});
+// persistent end-day control
+const endBtn=document.createElement('button');endBtn.type='button';endBtn.textContent='End Day (E)';endBtn.className='action primary ios-end-button';endBtn.style.display='none';endBtn.addEventListener('click',()=>{if(state)endDay()});document.body.appendChild(endBtn);
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js').catch(function (error) {
+      console.warn('Offline mode could not be enabled:', error);
+    });
+  });
+}
+</script>
+</body>
+</html>
