@@ -12,3 +12,5 @@ Version 4.2 adds a more realistic desktop GPU renderer with atmospheric shaders,
 Version 4.3 focuses on usability: graphical tab menus, icon-driven action buttons, a redesigned provincial atlas, and a visual province command panel.
 
 Version 4.4 adds a stronger graphical UI, aligned screen layouts, a redesigned Senate chamber and war room, a persistent HUD, and a more geographically recognizable map of the Imperium.
+
+Version 4.4.1 repairs submenu rendering and turns graphical hotspots, Senate seats and front nodes into object inspectors with related actions.
