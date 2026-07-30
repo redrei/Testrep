@@ -16,3 +16,5 @@ Version 4.4 adds a stronger graphical UI, aligned screen layouts, a redesigned S
 Version 4.4.1 repairs submenu rendering and turns graphical hotspots, Senate seats and front nodes into object inspectors with related actions.
 
 Version 4.4.2 repairs Capital, Senate, War Room, and Province Map navigation and click handling, including lexical save-state initialization and direct graphical control binding.
+
+Version 4.4.3 fixes the private hero renderer scope error and restores scene-change notifications so Research and other visual feeds render correctly.

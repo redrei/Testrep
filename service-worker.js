@@ -1,4 +1,4 @@
-const CACHE = 'imperium-aeternum-v4.4.2-0';
+const CACHE = 'imperium-aeternum-v4.4.3-0';
 const APP_SHELL = [
   './',
   './index.html',
