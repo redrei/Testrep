@@ -1,16 +1,24 @@
 {
   "id": "./",
-  "name": "Imperium Aeternum II v2.6",
-  "short_name": "Imperium II",
-  "description": "A code-drawn political RPG in an eternal modern Roman Empire.",
+  "name": "Imperium Aeternum III",
+  "short_name": "Imperium III",
+  "description": "A grand-strategy political RPG in an eternal modern Roman Empire, with code-generated graphics.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#110c09",
   "theme_color": "#130e0b",
-  "orientation": "portrait-primary",
-  "categories": ["games", "entertainment", "strategy"],
+  "orientation": "any",
+  "categories": [
+    "games",
+    "entertainment",
+    "strategy"
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -30,5 +38,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "version": "3.0.0"
 }
