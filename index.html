@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#130e0b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Imperium II">
-<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="Imperium II"><meta name="format-detection" content="telephone=no"><title>Imperium Aeternum II — v2.6</title>
+<meta name="theme-color" content="#130e0b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Imperium V">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="Imperium V"><meta name="format-detection" content="telephone=no"><title>Imperium Aeternum V — RPG Imperium</title>
 <style>
 :root{--bg:#110c09;--panel:#241912;--panel2:#322219;--gold:#e0b867;--cream:#f4e4c7;--muted:#baa789;--line:#5f4936;--red:#9b4039;--green:#44764c;--blue:#416b8b;--purple:#725887}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top,#352419 0,#110c09 48%,#080605 100%);color:var(--cream);font-family:Georgia,serif;-webkit-text-size-adjust:100%}button,input,select{font:inherit}button{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.hide{display:none!important}
@@ -29,7 +29,7 @@
 @media(prefers-reduced-motion:reduce){.v41-map *,.v41-hotspot{animation:none!important}}
 </style>
 </head><body><div id="toast" class="toast"></div><div id="app">
-<div class="title">IMPERIUM AETERNUM III</div><div class="subtitle">The Eternal Senate • Version 3.0 — Grand Strategy RPG</div><div id="artStage" class="art-stage" aria-label="Animated view of Nova Roma"><canvas id="worldCanvas"></canvas><div class="scene-label"><b id="sceneTitle">NOVA ROMA</b><span id="sceneSub">Marble, neon and eternal ambition</span></div></div>
+<div class="title">IMPERIUM AETERNUM V</div><div class="subtitle">Version 5 • RPG Overhaul</div><div id="artStage" class="art-stage" aria-label="Animated view of Nova Roma"><canvas id="worldCanvas"></canvas><div class="scene-label"><b id="sceneTitle">NOVA ROMA</b><span id="sceneSub">Marble, neon and eternal ambition</span></div></div>
 <section id="creation" class="screen active panel creation"><h2>Create Your Senator</h2><label>Name</label><input id="nameInput" value="Marcus Valerius"><h3 style="margin-top:14px">Origin</h3><div id="origins" class="origins"></div><button id="startBtn" class="btn primary" style="width:100%;margin-top:12px">Enter the Senate</button><button id="continueBtn" class="btn blue hide" style="width:100%;margin-top:8px">Continue Saved Dynasty</button></section>
 <section id="game" class="screen"><div class="grid">
 <div class="col left"><div class="panel"><h3 id="pname"></h3><div id="rank" class="small"></div><div class="meter">Health <span id="hpT"></span></div><div class="bar"><div id="hpB" class="fill"></div></div><div class="meter">Energy <span id="enT"></span></div><div class="bar"><div id="enB" class="fill energy"></div></div><div class="meter">Experience <span id="xpT"></span></div><div class="bar"><div id="xpB" class="fill xp"></div></div><div id="stats"></div></div><div class="panel"><h3>Resources</h3><div id="resources"></div></div><div class="panel"><h3>Faction Standing</h3><div id="factions"></div></div></div>
@@ -597,7 +597,7 @@ let prevEnsure=window.ensure4;window.ensure4=function(){prevEnsure();ensureV41()
 let prevView=window.renderView;window.renderView=function(){if(currentTab==='Provinces'){$('view').innerHTML=mapView();requestAnimationFrame(bindMap)}else prevView();requestAnimationFrame(placeHotspots)};
 let prevRender=window.render;window.render=function(){prevRender();requestAnimationFrame(placeHotspots)};
 let prevTab=window.tab;window.tab=function(t){prevTab(t);requestAnimationFrame(placeHotspots)};
-function boot41(){document.title='Imperium Aeternum IV — Realistic Interactive Imperium';let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Interactive Imperium • Version 4.2 — Realistic GPU Visuals';let title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM IV';if(S){ensureV41();render()}placeHotspots()}
+function boot41(){document.title='Imperium Aeternum V — RPG Imperium';let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul';let title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';if(S){ensureV41();render()}placeHotspots()}
 addEventListener('DOMContentLoaded',boot41);if(document.readyState!=='loading')setTimeout(boot41,0);
 })();
 </script>
@@ -889,6 +889,885 @@ function restoreVisualFeed(){
 const previousRender=window.render;
 window.render=function(){const out=previousRender();requestAnimationFrame(restoreVisualFeed);return out};
 addEventListener('DOMContentLoaded',restoreVisualFeed);if(document.readyState!=='loading')setTimeout(restoreVisualFeed,0);
+})();
+</script>
+
+<style id="v45-style">
+/* V4.5 RPG systems, recovery paths and stability fixes */
+.v45-sheet{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;align-items:start}
+.v45-paperdoll{border:1px solid #806343;border-radius:16px;background:linear-gradient(180deg,#211812,#100d0b);padding:12px;text-align:center}
+.v45-portrait{width:150px;height:180px;margin:0 auto 10px;border:1px solid #ac824d;border-radius:14px;background:#090b0f;display:block;box-shadow:inset 0 0 28px #0008}
+.v45-loadout{display:grid;gap:7px;margin-top:10px}.v45-slot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px;border:1px solid #4c3c2d;border-radius:10px;background:#15100d;font-size:12px}.v45-slot b{color:#f0cd78}
+.v45-traits,.v45-journal,.v45-map-orders{display:grid;gap:8px}.v45-trait,.v45-entry,.v45-order{border:1px solid #5d4934;border-radius:12px;background:#15110e;padding:10px}.v45-trait b,.v45-entry b{color:#f0cd78}.v45-entry{border-left:3px solid #d2aa60}.v45-hero-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.v45-hero-row div{border:1px solid #47382c;border-radius:11px;background:#0f0d0b;padding:9px;text-align:center}.v45-hero-row b{display:block;color:#f0cd78;font-size:18px}
+.v45-recovery{margin-top:10px;border:1px solid #557052;border-radius:12px;background:linear-gradient(180deg,#172016,#10110d);padding:10px}.v45-inline-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.v45-danger{border-color:#a9554c;background:#241411}.v45-note{border:1px solid #435a5f;background:#0e1518;border-radius:12px;padding:10px;margin:10px 0}
+.v44-map-wrap{position:relative}.v45-risk-pin{position:absolute;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid #ffd996;background:#2a1713;color:#ffd996;font-size:13px;box-shadow:0 0 0 0 #e0675888;animation:v45pin 1.7s infinite}.v45-risk-pin:hover{transform:scale(1.08);background:#7d302b}
+@keyframes v45pin{50%{box-shadow:0 0 0 8px #e0675800}}
+@media(max-width:760px){.v45-sheet{grid-template-columns:1fr}.v45-hero-row,.v45-inline-actions{grid-template-columns:1fr 1fr}.v45-portrait{width:130px;height:156px}}
+</style>
+<script id="v45-rpg-stability">
+(()=>{
+'use strict';
+const V45_TABS=[
+ ['Capital','🏛','Capital'],['Character','👤','Character'],['Senate','🗳️','Senate'],['Imperial Council','👑','Council'],['Provinces','🗺️','Map'],['Campaign','📣','Campaign'],['War Room','⚔️','War'],['Military','🛡','Military'],['Diplomacy','🤝','Diplomacy'],['Missions','✦','Missions'],['Estate','🏡','Estate'],['Research','⚙️','Research'],['People','👥','People'],['Legacy','🏅','Legacy'],['Journal','📖','Journal'],['Chronicle','📜','Chronicle']
+];
+const V45_ITEMS=[
+ {id:'laurel',name:'Campaign Laurel',slot:'Head',cost:260,stat:'charisma',bonus:1,desc:'A recognizable public image for rallies and elections.'},
+ {id:'cuirass',name:'Officer Cuirass',slot:'Body',cost:420,stat:'endurance',bonus:1,desc:'Armor fitted for public danger and frontier reviews.'},
+ {id:'codex',name:'Annotated Law Codex',slot:'Hand',cost:360,stat:'rhetoric',bonus:1,desc:'Prepared arguments and precedents for Senate maneuvers.'},
+ {id:'seal',name:'Household Signet',slot:'Ring',cost:520,stat:'influence',bonus:8,desc:'An old contract seal that opens private doors.'},
+ {id:'lens',name:'Augur Lens',slot:'Relic',cost:680,stat:'learning',bonus:1,desc:'A ritual data lens used by temple archivists.'}
+];
+const V45_TRAITS=[
+ {id:'orator',name:'Forum Orator',desc:'Win three public actions. Speeches and rallies gain extra impact.',test:s=>(s.v45?.counts?.speech||0)+(s.v45?.counts?.rally||0)>=3},
+ {id:'administrator',name:'Provincial Administrator',desc:'Resolve four province orders. Investments reduce more unrest.',test:s=>(s.v45?.counts?.provinceOrder||0)>=4},
+ {id:'duelist',name:'Subura Veteran',desc:'Defeat five enemies. Combat starts with a guard reserve.',test:s=>s.enemiesDefeated>=5},
+ {id:'scholar',name:'Imperial Scholar',desc:'Complete four research projects. Study becomes more reliable.',test:s=>s.research.length>=4},
+ {id:'magnate',name:'Estate Magnate',desc:'Own three businesses. Daily income grants influence.',test:s=>s.businesses.length>=3}
+];
+function own(o,k,d){if(o[k]==null)o[k]=d;return o[k]}
+function clampAll(){
+ if(!S)return;
+ ['money','influence','popularity','favor','piety','corruption','scandal','provinceSupport'].forEach(k=>{S[k]=Math.max(0,Math.round(Number(S[k])||0))});
+ ['hp','maxHp','energy','maxEnergy','xp','xpNext','level','office','day','year','businessSlots','billsPassed','electionsWon','enemiesDefeated'].forEach(k=>{S[k]=Math.max(k==='office'?0:1,Math.round(Number(S[k])||0))});
+ S.office=Math.min(S.office,offices.length-1);S.hp=Math.min(S.hp,S.maxHp);S.energy=Math.min(S.energy,S.maxEnergy);
+ Object.keys(S.world||{}).forEach(k=>S.world[k]=clamp(Math.round(Number(S.world[k])||0),0,1000));
+ Object.values(S.factions||{}).forEach(()=>{});Object.keys(S.factions||{}).forEach(k=>S.factions[k]=clamp(Math.round(Number(S.factions[k])||0),0,100));
+ Object.values(S.provinces||{}).forEach(p=>['loyalty','economy','unrest','military'].forEach(k=>p[k]=clamp(Math.round(Number(p[k])||0),0,100)));
+ if(S.v3?.fronts)S.v3.fronts.forEach(f=>['roman','enemy','supply','morale'].forEach(k=>f[k]=clamp(Math.round(Number(f[k])||0),0,100)));
+}
+function ensureRpg(){
+ if(!S)return;
+ S.version='5.0';
+ S.world=S.world||{treasury:500,economy:50,stability:50,military:45};
+ S.factions=S.factions||{Traditionalists:35,Imperialists:30,Merchants:35,Populists:30,Technocrats:30,Provincials:25};
+ S.provinces=S.provinces||{};provinces.forEach(n=>{S.provinces[n]=S.provinces[n]||{loyalty:45,economy:45,unrest:12,military:35,governor:'Acting Prefect'}});
+ ['businesses','companions','inventory','research','visited','passed','sideQuests','senators','log'].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[]});
+ if(!S.senators.length&&typeof makeSenators==='function')S.senators=makeSenators();
+ S.flags=S.flags||{};S.v41=S.v41||{mapVisits:0,cityInfluence:{},routes:[],intel:{},lastProvince:'Italia'};
+ provinces.forEach(n=>{own(S.v41.cityInfluence,n,0);if(!S.v41.intel[n])S.v41.intel[n]={surveyed:false,rumor:'No verified political report has been filed.'}});
+ S.v45=S.v45||{equipment:{Head:null,Body:null,Hand:null,Ring:null,Relic:null},owned:[],traits:[],journal:[],counts:{},lastRecovery:0};
+ ['Head','Body','Hand','Ring','Relic'].forEach(k=>own(S.v45.equipment,k,null));
+ own(S.v45,'owned',[]);own(S.v45,'traits',[]);own(S.v45,'journal',[]);own(S.v45,'counts',{});
+ if(S.v3?.fronts)S.v3.fronts.forEach((f,i)=>{own(f,'supply',50);own(f,'morale',50);own(f,'veterans',0);own(f,'commander',['Aelia Varro','Marcus Drusus','Titus Solon','Livia Corvinus'][i%4])});
+ V45_TRAITS.forEach(t=>{if(!S.v45.traits.includes(t.id)&&t.test(S)){S.v45.traits.push(t.id);journal(`Trait unlocked: ${t.name}`);toast(`Trait unlocked: ${t.name}`)}});
+ clampAll();
+}
+function journal(text){if(!S?.v45)return;S.v45.journal.unshift({day:S.day,year:S.year,text});S.v45.journal=S.v45.journal.slice(0,50)}
+function count(k,n=1){ensureRpg();S.v45.counts[k]=(S.v45.counts[k]||0)+n}
+function hasTrait(id){return !!S?.v45?.traits?.includes(id)}
+function itemById(id){return V45_ITEMS.find(i=>i.id===id)}
+function equippedBonus(stat){if(!S?.v45)return 0;return Object.values(S.v45.equipment).reduce((a,id)=>{let it=itemById(id);return a+(it&&it.stat===stat?it.bonus:0)},0)}
+function canPay(energy=0,money=0,influence=0){ensureRpg();if(S.energy<energy){toast(`Need ${energy} energy.`);return false}if(S.money<money){toast(`Need ${money} denarii.`);return false}if(S.influence<influence){toast(`Need ${influence} influence.`);return false}return true}
+function spendExact(energy=0,money=0,influence=0){if(!canPay(energy,money,influence))return false;S.energy-=energy;S.money-=money;S.influence-=influence;return true}
+function renderTabs45(){ensureRpg();let hasCouncil=typeof window.ensure4==='function'||!!S.v4;let html=V45_TABS.filter(t=>hasCouncil||t[0]!=='Imperial Council').map(([key,ico,label])=>`<button type="button" class="v43-tab ${currentTab===key?'active':''}" data-tab="${key}" onclick="tab('${key}')"><span class="ico">${ico}</span><span class="lbl">${label}</span>${currentTab===key?'<span class="dot"></span>':''}</button>`).join('');let tabs=$('tabs');tabs.className='tabs v43-dock v44-dock';tabs.innerHTML=html}
+function drawPlayer(cv){
+ if(!cv||!S)return;let x=cv.getContext('2d'),w=cv.width,h=cv.height,seed=0;for(let c of S.name)seed=(seed*33+c.charCodeAt(0))|0;let r=n=>Math.abs(Math.sin(seed+n)*9999)%1;
+ x.clearRect(0,0,w,h);let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#263445');g.addColorStop(1,'#120d0b');x.fillStyle=g;x.fillRect(0,0,w,h);
+ x.fillStyle='#d8b188';x.beginPath();x.arc(w*.5,h*.29,w*.15,0,7);x.fill();x.fillStyle=r(2)>.5?'#2a211d':'#d7c0a0';x.beginPath();x.arc(w*.5,h*.23,w*.16,Math.PI,0);x.fill();
+ x.fillStyle='#17110e';x.fillRect(w*.44,h*.29,3,3);x.fillRect(w*.55,h*.29,3,3);x.strokeStyle='#844637';x.beginPath();x.moveTo(w*.44,h*.37);x.quadraticCurveTo(w*.5,h*.4,w*.56,h*.37);x.stroke();
+ x.fillStyle='#efe5d1';x.beginPath();x.moveTo(w*.23,h);x.lineTo(w*.34,h*.5);x.lineTo(w*.66,h*.5);x.lineTo(w*.77,h);x.fill();x.strokeStyle='#9b3738';x.lineWidth=8;x.beginPath();x.moveTo(w*.36,h*.52);x.lineTo(w*.62,h);x.stroke();
+ if(S.v45?.equipment.Head){x.strokeStyle='#f0cd78';x.lineWidth=4;x.beginPath();x.arc(w*.5,h*.18,w*.17,Math.PI*1.05,Math.PI*1.95);x.stroke()}
+ if(S.v45?.equipment.Body){x.fillStyle='#a98a57aa';x.fillRect(w*.36,h*.57,w*.28,h*.24)}
+ if(S.v45?.equipment.Hand){x.fillStyle='#e8d49b';x.fillRect(w*.69,h*.61,8,h*.26)}
+ if(S.v45?.equipment.Ring){x.strokeStyle='#74dfe8';x.lineWidth=3;x.beginPath();x.arc(w*.31,h*.72,5,0,7);x.stroke()}
+ if(S.v45?.equipment.Relic){x.fillStyle='#8cf0ff';x.beginPath();x.arc(w*.5,h*.46,6+Math.sin(performance.now()/400)*2,0,7);x.fill()}
+}
+function characterView(){
+ ensureRpg();let slots=['Head','Body','Hand','Ring','Relic'];let traits=V45_TRAITS.map(t=>`<div class="v45-trait ${hasTrait(t.id)?'':'achievement locked'}"><b>${hasTrait(t.id)?'Unlocked':'Locked'}: ${t.name}</b><div class="small">${t.desc}</div></div>`).join('');
+ let available=V45_ITEMS.map(it=>{let owned=S.v45.owned.includes(it.id),equipped=Object.values(S.v45.equipment).includes(it.id);return `<div class="card"><b>${it.name}</b><div class="small">${it.slot} • ${it.desc}<br>Bonus: ${it.stat} +${it.bonus} • Cost ${it.cost}</div><button class="btn ${equipped?'primary':owned?'blue':'good'}" onclick="${owned?`equipItem('${it.id}')`:`buyItem('${it.id}')`}">${equipped?'Equipped':owned?'Equip':'Buy'}</button></div>`}).join('');
+ return `<h2>Character</h2><div class="v45-sheet"><div class="v45-paperdoll"><canvas id="v45Portrait" class="v45-portrait" width="300" height="360"></canvas><b>${esc(S.name)}</b><div class="small">${offices[S.office].name} • Level ${S.level}</div><div class="v45-loadout">${slots.map(s=>{let it=itemById(S.v45.equipment[s]);return `<div class="v45-slot"><span>${s}</span><b>${it?it.name:'Empty'}</b></div>`}).join('')}</div></div><div><div class="v45-hero-row"><div><b>${S.hp}/${S.maxHp}</b><span class="small">Health</span></div><div><b>${S.energy}/${S.maxEnergy}</b><span class="small">Energy</span></div><div><b>${S.money}</b><span class="small">Denarii</span></div><div><b>${S.influence}</b><span class="small">Influence</span></div></div><div class="v45-recovery"><b>Recovery Orders</b><div class="small">These actions guarantee the dynasty can always recover from debt, exhaustion, or crisis.</div><div class="v45-inline-actions"><button class="btn good" onclick="restAtEstate()">Rest</button><button class="btn" onclick="petitionPatrons()">Petition Patrons</button><button class="btn blue" onclick="triageEmpire()">Triage Crisis</button></div></div><h3>Traits</h3><div class="v45-traits">${traits}</div></div></div><h3>Equipment</h3><div class="cards">${available}</div>`;
+}
+function journalView(){ensureRpg();let entries=S.v45.journal.length?S.v45.journal.map(e=>`<div class="v45-entry"><b>Day ${e.day}, ${e.year} A.U.C.</b><div class="small">${esc(e.text)}</div></div>`).join(''):'<div class="small">No personal journal entries yet.</div>';return `${hero4('Personal Record','Dynasty Journal','Major actions, recovery choices and trait unlocks are now tracked for RPG continuity.')}<div class="v45-journal">${entries}</div>`}
+function enhanceView(){
+ if(!S)return;ensureRpg();
+ if(currentTab==='Character')requestAnimationFrame(()=>drawPlayer(document.getElementById('v45Portrait')));
+ if(currentTab==='Capital'&&!document.querySelector('.v45-recovery')){let view=$('view');if(view)view.insertAdjacentHTML('beforeend',`<div class="v45-recovery"><b>Safe recovery</b><div class="small">Out of money or energy never ends the dynasty.</div><div class="v45-inline-actions"><button class="btn good" onclick="restAtEstate()">Rest</button><button class="btn" onclick="petitionPatrons()">Petition Patrons</button><button class="btn blue" onclick="triageEmpire()">Triage Crisis</button></div></div>`)}
+ if(currentTab==='Provinces')enhanceProvinceMap();
+}
+function enhanceProvinceMap(){
+ let panel=document.querySelector('.v44-side-panel,.v44-map-layout .v44-panel.pad,.v43-side-card,.v41-selected');if(panel&&!panel.querySelector('.v45-map-orders'))panel.insertAdjacentHTML('beforeend',`<div class="v45-map-orders"><h3>Governor Orders</h3><button class="btn good" onclick="provinceOrder('relief')">Relief Mission</button><button class="btn" onclick="provinceOrder('patrol')">Local Patrol</button><button class="btn blue" onclick="provinceOrder('charter')">Trade Charter</button></div>`);
+ let wrap=document.querySelector('.v44-map-wrap,.v43-map-wrap');if(!wrap||wrap.querySelector('.v45-risk-pin'))return;
+ let risky=provinces.map(n=>[n,S.provinces[n]]).filter(([,p])=>p.unrest>55||p.loyalty<35).slice(0,4);
+ risky.forEach(([n],i)=>{let b=document.createElement('button');b.className='v45-risk-pin';b.title=`Inspect ${n}`;b.textContent='!';b.style.left=(18+i*18)+'%';b.style.top=(20+(i%2)*55)+'%';b.addEventListener('click',()=>{S.v41.lastProvince=n;if(typeof tab==='function')tab('Provinces');toast(`${n} needs attention.`)});wrap.appendChild(b)});
+}
+window.buyItem=function(id){ensureRpg();let it=itemById(id);if(!it)return;if(S.v45.owned.includes(id))return equipItem(id);if(!spendExact(0,it.cost,0))return;S.v45.owned.push(id);journal(`Purchased ${it.name}.`);equipItem(id)}
+window.equipItem=function(id){ensureRpg();let it=itemById(id);if(!it||!S.v45.owned.includes(id))return;S.v45.equipment[it.slot]=id;journal(`Equipped ${it.name}.`);render()}
+window.restAtEstate=function(){ensureRpg();if(S.v45.lastRecovery===S.day)return toast('You have already recovered today.');S.v45.lastRecovery=S.day;S.hp=S.maxHp;S.energy=S.maxEnergy;S.scandal=Math.max(0,S.scandal-1);journal('Rested at the estate and recovered health and energy.');addLog('You withdraw to the estate long enough to recover.');render()}
+window.petitionPatrons=function(){ensureRpg();let gain=120+roll(160)+Math.floor((S.charisma+equippedBonus('charisma'))*12);S.money+=gain;S.influence=Math.max(0,S.influence-2);S.scandal+=1;count('petition');journal(`Petitioned patrons for ${gain} denarii.`);addLog(`Patrons advance ${gain} denarii against future favors.`);render()}
+window.triageEmpire=function(){ensureRpg();let target=provinces.slice().sort((a,b)=>S.provinces[b].unrest-S.provinces[a].unrest)[0],p=S.provinces[target];p.unrest=clamp(p.unrest-6,0,100);p.loyalty=clamp(p.loyalty+2,0,100);S.world.stability=clamp(S.world.stability+2,0,100);S.energy=Math.max(0,S.energy-1);journal(`Emergency triage stabilizes ${target}.`);addLog(`Emergency triage teams stabilize ${target}.`);render()}
+window.provinceOrder=function(kind){ensureRpg();let n=S.v41?.lastProvince||'Italia',p=S.provinces[n];if(kind==='relief'){if(!spendExact(1,180,0))return;p.unrest-=8;p.loyalty+=4;S.popularity+=2}if(kind==='patrol'){if(!spendExact(1,0,0))return;let ok=check('strategy',11);p.unrest-=ok?7:2;p.military+=ok?3:1;S.favor+=ok?2:0}if(kind==='charter'){if(!spendExact(1,120,0))return;p.economy+=7;S.factions.Merchants=clamp(S.factions.Merchants+3,0,100)}['loyalty','unrest','economy','military'].forEach(k=>p[k]=clamp(p[k],0,100));count('provinceOrder');journal(`Issued a ${kind} order in ${n}.`);addLog(`The governor of ${n} receives your ${kind} order.`);render()}
+const prevCheck=window.check;window.check=function(stat,diff){return roll(12)+(S?.[stat]||0)+equippedBonus(stat)+(hasTrait('scholar')&&stat==='learning'?1:0)+(hasTrait('orator')&&(stat==='rhetoric'||stat==='charisma')?1:0)+(S?.companions||[]).filter(c=>c.stat===stat).reduce((a,c)=>a+c.bonus,0)>=diff}
+window.train=function(stat){let cost=80;if(!spendExact(2,cost,0))return;let rate=.55+(hasTrait('scholar')&&stat==='learning'?.2:0);if(Math.random()<rate)S[stat]++;gainXP(18);journal(`Trained ${stat}.`);addLog(`You spend the afternoon training ${stat}.`);render()}
+window.salon=function(){if(!spendExact(2,180,0))return;S.influence+=10+equippedBonus('influence');Object.keys(S.factions).forEach(k=>S.factions[k]=clamp(S.factions[k]+roll(3),0,100));addLog('A carefully seated dinner produces several useful alliances.');render()}
+window.temple=function(){if(!spendExact(1,60,0))return;S.piety+=5;S.hp=clamp(S.hp+20,0,S.maxHp);addLog('The augurs offer ambiguous comfort and excellent intelligence.');render()}
+window.campaignAction=function(type){let costs={rally:[2,120],ads:[1,300],debate:[2,80],donors:[1,0]}[type];if(!costs)return;if(!spendExact(costs[0],costs[1],0))return;if(type==='rally'){S.popularity+=5+roll(5)+(hasTrait('orator')?2:0);S.provinceSupport+=2;count('rally')}if(type==='ads'){S.popularity+=4+roll(6);S.scandal+=Math.random()<.2?2:0}if(type==='debate'){let ok=check('rhetoric',14);S.popularity+=ok?9:-4;S.influence+=ok?6:0}if(type==='donors'){S.money+=150+roll(300);S.scandal+=roll(3)}journal(`Campaign action: ${type}.`);addLog(`Your campaign conducts a ${type} operation.`);render()}
+window.recruit=function(name){let c=companions.find(x=>x.name===name);if(!c)return;let cost=150+S.companions.length*100;if(!spendExact(1,cost,0))return;let ok=check('charisma',11+S.companions.length);if(ok){S.companions.push({...c,loyalty:c.loyalty??45});journal(`${c.name} joined the household.`);addLog(`${c.name} joins your household as ${c.role}.`)}else addLog(`${c.name} politely refuses your offer.`);render()}
+window.v3Operation=function(i,type){if(typeof ensure==='function')ensure();ensureRpg();let f=S.v3?.fronts?.[i];if(!f)return toast('That front is unavailable.');let money=type==='supply'?240:0;if(!spendExact(2,money,0))return;if(type==='recon'){let ok=check('learning',13);f.enemy=Math.max(0,f.enemy-(ok?8:2));S.influence+=ok?5:0;if(typeof chronicle==='function')chronicle(`${f.name}: intelligence teams expose enemy deployments.`)}if(type==='supply'){f.roman=Math.min(100,f.roman+12+Math.floor(S.strategy/3));f.supply=clamp((f.supply||50)+8,0,100);if(typeof chronicle==='function')chronicle(`${f.name}: fresh supplies reach the frontier.`)}if(type==='attack'){let chance=50+(f.roman-f.enemy)+S.strategy*2+(S.v3.doctrine==='The Iron Limes'?12:0);if(roll(100)<chance){f.enemy=Math.max(0,f.enemy-18-roll(15));f.roman=Math.max(8,f.roman-roll(7));S.influence+=15;S.v3.legacy+=3;if(f.enemy<=5){S.v3.warsWon++;f.enemy=24+roll(25);S.money+=700;S.favor+=8}}else{f.roman=Math.max(5,f.roman-10-roll(12));S.popularity-=3;S.world.stability-=2}}render()}
+window.v4Lobby=function(side){ensureRpg();if(!spendExact(2,0,0))return;let a=S.v4.agenda,boost=5+Math.floor((S.rhetoric+equippedBonus('rhetoric'))/2)+roll(6);if(side==='support'){a.support+=boost;S.v4.politicalCapital+=2}else{a.opposition+=boost;S.v4.reputation.Traditionalist+=1}render()}
+window.v4Front=function(i,a){ensureRpg();let f=S.v3?.fronts?.[i];if(!f)return toast('That front is unavailable.');if(a==='rotate'){if(!spendExact(0,0,8))return;f.commander=['Aelia Varro','Marcus Drusus','Titus Solon','Livia Corvinus','Cassian Marcellus','Octavia Severina'][roll(6)];f.morale+=5}if(a==='fortify'){if(!spendExact(0,350,0))return;f.supply+=15;f.roman+=8;f.morale+=4}if(a==='offensive'){if(!spendExact(3,0,0))return;let chance=45+(f.roman-f.enemy)+(f.supply-50)/3+(f.morale-50)/3+f.veterans*2+S.strategy*2;if(roll(100)<chance){f.enemy-=18+roll(18);f.roman-=3+roll(8);f.supply-=10;f.morale+=8;f.veterans++;S.influence+=18}else{f.roman-=10+roll(12);f.supply-=14;f.morale-=12;S.popularity-=4}}['roman','enemy','supply','morale'].forEach(k=>f[k]=clamp(f[k],0,100));journal(`War order issued: ${a} at ${f.name}.`);render()}
+window.decree=function(type){ensureRpg();let cost=35,festival=type==='festival'?300:0;if(!spendExact(0,festival,cost))return;if(type==='amnesty'){provinces.forEach(n=>{S.provinces[n].unrest-=4;S.provinces[n].loyalty+=2});S.favor-=4}if(type==='austerity'){S.world.treasury+=240;S.popularity-=7;S.world.economy-=3}if(type==='festival'){S.popularity+=10;S.world.stability+=4}if(type==='purge'){S.corruption-=9;S.scandal+=3;S.factions.Traditionalists-=5}S.v253?.decrees?.push(type);journal(`Issued decree: ${type}.`);addLog(`You issue an emergency decree: ${type}.`);render()}
+const previousCombatModal=window.combatModal;window.combatModal=function(){let c=S.combat;if(!c)return;modal(`<h2>Street Conflict</h2><div class="combat-grid"><div><canvas id="v45CombatPlayer" class="v45-portrait" width="220" height="250"></canvas><b>${esc(S.name)}</b><div>HP ${S.hp}/${S.maxHp}</div><div class="small">${hasTrait('duelist')?'Veteran guard active':'Guard before heavy blows'}</div></div><div><div class="portrait">⚔️</div><b>${c.name}</b><div>HP ${c.hp}/${c.maxHp}</div></div></div><div class="choices" style="margin-top:12px"><button class="choice" onclick="combat('strike')">Gladius Strike</button><button class="choice" onclick="combat('speech')">Commanding Rebuke</button><button class="choice" onclick="combat('guard')">Guard</button><button class="choice" onclick="combat('drone')">Call Security Drone (75)</button><button class="choice" onclick="combat('withdraw')">Withdraw</button></div>`);requestAnimationFrame(()=>drawPlayer(document.getElementById('v45CombatPlayer')))}
+window.combat=function(a){ensureRpg();let c=S.combat;if(!c)return;if(a==='withdraw'){S.scandal+=1;S.hp=clamp(S.hp-8,1,S.maxHp);S.combat=null;closeModal();addLog('You withdraw before the fight becomes fatal.');render();return}let damage=0;if(a==='strike')damage=roll(8)+S.strength*2+equippedBonus('strength');if(a==='speech')damage=roll(6)+S.rhetoric*2+equippedBonus('rhetoric');if(a==='guard')c.guard=8+S.endurance+(hasTrait('duelist')?4:0);if(a==='drone'){if(!spendExact(0,75,0))return;damage=18+S.strategy*2}c.hp-=damage;if(c.hp<=0){S.enemiesDefeated++;S.money+=90+roll(110);S.influence+=4;count('combatWin');gainXP(45);addLog(`<span class="good-text">${c.name} is defeated.</span>`);S.combat=null;closeModal();render();return}let hit=Math.max(1,c.dmg+roll(7)-(c.guard||0)-S.endurance);c.guard=0;S.hp-=hit;if(S.hp<=0){S.hp=Math.ceil(S.maxHp*.35);S.money=Math.max(0,S.money-100);S.scandal+=2;addLog('You awaken under guard in a private clinic.');S.combat=null;closeModal();endDay();return}combatModal()}
+const prevSpeech=window.speech;window.speech=function(){if(!spendExact(2,0,0))return;let ok=check('rhetoric',11);S.popularity+=ok?8+(hasTrait('orator')?2:0):-2;S.influence+=ok?6:1;count('speech');gainXP(ok?25:10);addLog(ok?'Your Forum speech becomes the day’s defining broadcast.':'Hecklers and a faulty sound system blunt your speech.');render()}
+const prevEndDay=window.endDay;window.endDay=function(){ensureRpg();prevEndDay();ensureRpg();if(hasTrait('magnate'))S.influence+=Math.min(5,S.businesses.length);clampAll();autoSave()}
+const prevRenderTabs=window.renderTabs;window.renderTabs=renderTabs45;
+const prevRenderView=window.renderView;window.renderView=function(){ensureRpg();if(currentTab==='Character'){$('view').innerHTML=characterView();requestAnimationFrame(enhanceView);return}if(currentTab==='Journal'){$('view').innerHTML=journalView();return}try{prevRenderView()}catch(err){console.error(err);$('view').innerHTML=`<div class="v442-error"><b>Screen recovered from an error.</b><div class="small">${esc(err.message||err)}</div><button class="btn" onclick="tab('Capital')">Return to Capital</button></div>`}requestAnimationFrame(enhanceView)}
+const prevRender=window.render;window.render=function(){ensureRpg();let out=prevRender();ensureRpg();requestAnimationFrame(enhanceView);return out}
+const prevStart=window.start;window.start=function(){prevStart();ensureRpg();journal(`${S.name} begins a new dynasty.`);render()}
+const prevLoad=window.loadGame;window.loadGame=function(){prevLoad();setTimeout(()=>{ensureRpg();render();toast('Save migrated to Version 5.')},0)}
+function bindTabs45(){document.addEventListener('click',e=>{let b=e.target.closest?.('[data-tab]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();window.tab(b.dataset.tab)},true)}
+function boot(){bindTabs45();let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul';let title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';if(S){ensureRpg();render()}}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
+})();
+</script>
+
+<style id="v46-ui-ux">
+/* V4.6 usability pass */
+:root{--ux-bg:#0b0c0d;--ux-panel:#15110e;--ux-panel2:#211811;--ux-line:#6d583f;--ux-gold:#efc76b;--ux-cyan:#79e7f5;--ux-ok:#76c58e;--ux-bad:#e88376}
+body{background:radial-gradient(circle at 50% -8%,#302219 0,#11100e 42%,#070708 100%);font-family:Georgia,serif}
+button{position:relative}.btn,.choice,.v44-tile,.v44-act,.v43-tab,.v44-province-btn,.origin{transition:transform .12s ease,border-color .12s ease,background .12s ease,box-shadow .12s ease,opacity .12s ease}
+.btn:hover,.choice:hover,.v44-tile:hover,.v44-act:hover,.v43-tab:hover,.v44-province-btn:hover,.origin:hover{box-shadow:0 10px 22px #0006,0 0 0 1px #efc76b33 inset}
+.btn:focus-visible,.choice:focus-visible,.v44-tile:focus-visible,.v44-act:focus-visible,.v43-tab:focus-visible,.v44-province-btn:focus-visible,.origin:focus-visible{outline:3px solid #79e7f5;outline-offset:2px}
+.btn[data-blocked="1"],.choice[data-blocked="1"],.v44-tile[data-blocked="1"],.v44-act[data-blocked="1"]{opacity:.58;filter:saturate(.65)}
+.v46-cost{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 6px;border-radius:999px;border:1px solid #5e4d38;background:#0c0d0ecc;color:#ead8b4;font:11px system-ui,sans-serif;line-height:1}
+.v46-cost.bad{border-color:#9b4a42;color:#ffb8ae;background:#20100f}.v44-tile .v46-cost,.v44-act .v46-cost,.v43-icon-btn .v46-cost{margin-top:2px}
+#v46TopBar{position:sticky;top:0;z-index:18;margin:0 0 10px;padding:8px;border:1px solid #5c4b37;border-radius:16px;background:linear-gradient(180deg,#16120fee,#0d0d0dcc);box-shadow:0 12px 28px #0008;backdrop-filter:blur(10px)}
+.v46-topline{display:grid;grid-template-columns:minmax(170px,1fr) auto;gap:10px;align-items:center}.v46-title b{display:block;color:#f2ce7a;font-size:15px}.v46-title span{font-size:11px;color:#c9b792}.v46-mini{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.v46-mini span{display:inline-flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid #4e4030;border-radius:999px;background:#0b0d0e;color:#eadbbd;font:11px system-ui,sans-serif}.v46-mini b{color:#f2ce7a}
+.v46-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}.v46-actions button{min-height:38px;padding:7px 8px;border-radius:11px;font:12px system-ui,sans-serif}
+.tabs.v43-dock.v44-dock{position:sticky;top:76px;z-index:14;padding:8px;border:1px solid #4c3e2d;border-radius:16px;background:#0d0d0ddd;backdrop-filter:blur(10px);box-shadow:0 10px 25px #0007}
+.v44-dock .v43-tab{min-height:68px;border-radius:14px}.v43-tab .ico{width:30px;height:30px}.v43-tab .lbl{font-family:system-ui,sans-serif;font-weight:650;letter-spacing:0}
+.v44-hud{margin-top:2px}.v44-chip{border-radius:12px}.v44-chip b{font-family:system-ui,sans-serif}.panel{border-radius:12px}.card{border-radius:10px}.v44-panel,.v44-map-panel,.v44-side-panel,.v43-side-card,.v43-map-card{border-radius:14px}
+.cards{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.actions{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.card,.v4-card,.v3-card{box-shadow:0 10px 22px #0004}.card:hover,.v4-card:hover,.v3-card:hover{border-color:#9f8357}
+#log{height:230px}.log-entry:first-child{background:#1c1510;border-radius:8px;padding-left:8px}.toast{max-width:min(92vw,520px);border-radius:12px;text-align:center;box-shadow:0 14px 32px #0009;font-family:system-ui,sans-serif}
+.modal{z-index:60}.modal-card{border-radius:14px;box-shadow:0 25px 80px #000c}.modal-card h2{font-size:24px}
+.v46-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}.v46-section-head .small{text-align:right}
+.v45-recovery{box-shadow:inset 0 1px #ffffff10}.v45-inline-actions .btn{min-height:46px}
+@media(max-width:900px){#app{padding-left:9px;padding-right:9px}.v46-topline{grid-template-columns:1fr}.v46-mini{justify-content:flex-start}.v46-actions{grid-template-columns:repeat(2,1fr)}.tabs.v43-dock.v44-dock{top:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px}.v44-dock .v43-tab{min-width:86px;scroll-snap-align:start}.v44-hud{grid-template-columns:repeat(2,1fr)}.bottom{left:8px;right:8px}.bottom button{font-family:system-ui,sans-serif;font-size:13px}.cards{grid-template-columns:1fr}.v44-province-bar{display:flex;overflow:auto}.v44-province-btn{min-width:106px}}
+@media(max-width:520px){.title{font-size:24px}.subtitle{font-size:12px}.art-stage{height:190px}.v46-mini span{font-size:10px}.v46-actions button{font-size:11px}.v44-dock .v43-tab{min-width:78px}.v43-tab .lbl{font-size:10px}.v44-action-grid,.v44-actions,.v45-inline-actions{grid-template-columns:1fr 1fr}.v45-hero-row{grid-template-columns:1fr 1fr}.modal-card{max-height:86dvh}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+<script id="v46-ui-ux">
+(()=>{
+'use strict';
+const COST_RULES=[
+ [/speech\(\)|Forum|Address Crowd|Address the Forum/i,{energy:2}],
+ [/train\('learning'\)|Archives|Study/i,{energy:2,money:80}],
+ [/train\('strength'\)|Praetorium|Train/i,{energy:2,money:80}],
+ [/salon\(\)|Salon/i,{energy:2,money:180}],
+ [/investigate\(\)|Inquiry|Investigate/i,{energy:2}],
+ [/fight\(\)|Subura|Patrol Streets|Patrol the Subura/i,{energy:2}],
+ [/palace\(\)|Palace|Request Audience/i,{energy:2}],
+ [/temple\(\)|Temple|Consult Rites/i,{energy:1,money:60}],
+ [/campaignAction\('rally'\)|Hold Rally|Campaign Rally/i,{energy:2,money:120}],
+ [/campaignAction\('ads'\)|Media Campaign|Buy Ads/i,{energy:1,money:300}],
+ [/campaignAction\('debate'\)|Debate/i,{energy:2,money:80}],
+ [/travelProvince|data-mapact=\"travel\"|Travel/i,{energy:2}],
+ [/investProvince|data-mapact=\"civic\"|data-mapact=\"economy\"|data-mapact=\"military\"|Civic|Invest|Fortify/i,{money:250}],
+ [/data-mapact=\"survey\"|Gather Intelligence|Intel/i,{energy:1}],
+ [/data-mapact=\"rally\"|Rally/i,{energy:2}],
+ [/provinceOrder\('relief'\)|Relief Mission/i,{energy:1,money:180}],
+ [/provinceOrder\('patrol'\)|Local Patrol/i,{energy:1}],
+ [/provinceOrder\('charter'\)|Trade Charter/i,{energy:1,money:120}],
+ [/v4Front\([^,]+,'rotate'\)|Rotate/i,{influence:8}],
+ [/v4Front\([^,]+,'fortify'\)|Fortify/i,{money:350}],
+ [/v4Front\([^,]+,'offensive'\)|Grand Offensive|Offensive/i,{energy:3}],
+ [/v3Operation\([^,]+,'recon'\)|Recon|Eastern Intel/i,{energy:2}],
+ [/v3Operation\([^,]+,'supply'\)|Supply|Resupply/i,{energy:2,money:240}],
+ [/v4Lobby|Build Coalition|Disrupt Rivals|Mobilize Opposition/i,{energy:2}],
+ [/committee\(\)|Committee/i,{energy:1}],
+ [/whipVotes\(\)|Whip/i,{energy:2}],
+ [/exposeRival\(\)|Expose/i,{energy:2}],
+ [/recruit\(|Approach/i,{energy:1}],
+ [/buyItem\(/i,{dynamic:'item'}],
+ [/buyBusiness\(/i,{dynamic:'business'}],
+ [/raiseCohort\(/i,{dynamic:'cohort'}],
+ [/rerollMissions\(\)|New Docket/i,{money:120}]
+];
+function state(){return typeof S!=='undefined'&&S?S:null}
+function costText(c){let bits=[];if(c.energy)bits.push(`${c.energy} EN`);if(c.money)bits.push(`${c.money} D`);if(c.influence)bits.push(`${c.influence} INF`);return bits.join(' • ')}
+function resolveDynamic(btn,code,cost){
+ if(cost.dynamic==='item'){let m=code.match(/buyItem\('([^']+)'\)/),it=m&&typeof itemById==='function'?itemById(m[1]):null;return it?{money:it.cost}:{}}
+ if(cost.dynamic==='business'){let name=(code.match(/buyBusiness\('([^']+)'\)/)||[])[1]?.replace(/\\'/g,"'"),b=typeof businesses!=='undefined'&&businesses.find(x=>x.name===name);return b?{money:b.cost}:{}}
+ if(cost.dynamic==='cohort'){let name=(code.match(/raiseCohort\('([^']+)'\)/)||[])[1]?.replace(/\\'/g,"'"),c=typeof V253_COHORTS!=='undefined'&&V253_COHORTS.find(x=>x.name===name);return c?{money:c.cost}:{}}
+ return cost;
+}
+function inferCost(btn){
+ let code=btn.getAttribute('onclick')||'';let text=btn.textContent||'';let attrs=[...btn.attributes||[]].map(a=>`${a.name}=\"${a.value}\"`).join(' ');
+ let hay=`${code} ${text} ${attrs}`;
+ let rule=COST_RULES.find(([re])=>re.test(hay));if(!rule)return null;
+ return resolveDynamic(btn,code,rule[1]);
+}
+function afford(c){let s=state();if(!s||!c)return true;return (s.energy??0)>=(c.energy||0)&&(s.money??0)>=(c.money||0)&&(s.influence??0)>=(c.influence||0)}
+function blockReason(c){let s=state(),miss=[];if(!s||!c)return '';if((s.energy??0)<(c.energy||0))miss.push(`${c.energy} energy`);if((s.money??0)<(c.money||0))miss.push(`${c.money} denarii`);if((s.influence??0)<(c.influence||0))miss.push(`${c.influence} influence`);return miss.length?`Requires ${miss.join(', ')}.`:''}
+function decorateCosts(root=document){
+ if(!state())return;
+ root.querySelectorAll('button').forEach(btn=>{
+  if(btn.closest('#tabs')||btn.closest('.bottom')||btn.disabled&&btn.textContent.includes('In Progress'))return;
+  let c=inferCost(btn),txt=c&&costText(c);if(!txt)return;
+  let ok=afford(c),badge=btn.querySelector(':scope > .v46-cost');
+  if(!badge){badge=document.createElement('span');badge.className='v46-cost';btn.appendChild(badge)}
+  badge.textContent=txt;badge.classList.toggle('bad',!ok);
+  btn.dataset.blocked=ok?'0':'1';btn.setAttribute('aria-disabled',ok?'false':'true');btn.title=ok?txt:blockReason(c);
+ });
+}
+function interceptBlocked(){
+ document.addEventListener('click',e=>{
+  let b=e.target.closest?.('button[data-blocked=\"1\"]');if(!b)return;
+  e.preventDefault();e.stopImmediatePropagation();toast(b.title||'That action is unavailable right now.');
+ },true);
+}
+function topBar(){
+ let s=state(),game=document.getElementById('game');if(!s||!game)return;
+ let bar=document.getElementById('v46TopBar');if(!bar){bar=document.createElement('div');bar.id='v46TopBar';game.insertBefore(bar,game.firstChild)}
+ let office=typeof offices!=='undefined'&&offices[s.office]?offices[s.office].name:'Senator';
+ bar.innerHTML=`<div class="v46-topline"><div class="v46-title"><b>${currentTab||'Capital'}</b><span>${office} • Day ${s.day}, ${s.year} A.U.C.</span></div><div class="v46-mini"><span>❤ <b>${s.hp}/${s.maxHp}</b></span><span>⚡ <b>${s.energy}/${s.maxEnergy}</b></span><span>💰 <b>${Number(s.money||0).toLocaleString()}</b></span><span>✦ <b>${s.influence}</b></span></div></div><div class="v46-actions"><button class="btn good" type="button" onclick="restAtEstate()">Rest</button><button class="btn" type="button" onclick="petitionPatrons()">Patrons</button><button class="btn blue" type="button" onclick="triageEmpire()">Triage</button><button class="btn primary" type="button" onclick="endDay()">End Day</button></div>`;
+}
+function sectionHeads(){
+ let view=document.getElementById('view');if(!view||view.dataset.v46Head)return;let h=view.querySelector('h2');if(!h)return;
+ view.dataset.v46Head='1';let detail=document.createElement('div');detail.className='v46-section-head';h.parentNode.insertBefore(detail,h);detail.appendChild(h);
+ let s=state();let right=document.createElement('div');right.className='small';right.textContent=s?`Energy ${s.energy}/${s.maxEnergy} • ${Number(s.money||0).toLocaleString()} denarii`:'';detail.appendChild(right);
+}
+function polish(){
+ topBar();decorateCosts();sectionHeads();
+ document.querySelectorAll('.bottom button').forEach(btn=>{if(btn.dataset.v46)return;btn.dataset.v46='1';if(btn.textContent==='Save')btn.textContent='Save';if(btn.textContent==='End Day')btn.textContent='End Day';if(btn.textContent==='Menu')btn.textContent='Menu'});
+}
+const prevRender=window.render;window.render=function(){let out=prevRender();requestAnimationFrame(polish);return out}
+const prevModal=window.modal;window.modal=function(html){prevModal(html);requestAnimationFrame(()=>decorateCosts(document.getElementById('modalCard')||document))}
+function boot(){interceptBlocked();polish();let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Living Imperium • Version 4.6 — UI & UX Refinement'}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
+})();
+</script>
+<style id="v47-desktop-graphics">
+/* V4.7 desktop graphics pass */
+@media(min-width:1000px) and (pointer:fine){
+html{background:#05070a}
+body.desktop-nextgen{background:
+ radial-gradient(circle at 18% -8%,rgba(80,190,210,.28),transparent 34%),
+ radial-gradient(circle at 84% 2%,rgba(214,63,77,.20),transparent 30%),
+ radial-gradient(circle at 48% 23%,rgba(224,184,103,.16),transparent 34%),
+ linear-gradient(180deg,#07090d 0,#0b0d12 46%,#050506 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body.desktop-nextgen:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:42px 42px,42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 72%)}
+body.desktop-nextgen #app{max-width:1540px;padding-left:22px;padding-right:22px}
+body.desktop-nextgen .title{font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:clamp(32px,3.3vw,56px);font-weight:850;letter-spacing:.08em;color:#ffe29a;text-shadow:0 3px 18px rgba(235,184,85,.23),0 16px 38px #000;margin-top:2px}
+body.desktop-nextgen .subtitle{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#9fb4bc;letter-spacing:.08em;text-transform:uppercase}
+body.desktop-nextgen .art-stage{height:clamp(430px,38vw,640px);min-height:430px;border-radius:22px;border:1px solid rgba(159,218,231,.30);background:#05080d;box-shadow:0 28px 90px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.035) inset,0 0 70px rgba(92,207,227,.12);transform:translateZ(0)}
+body.desktop-nextgen .art-stage:before{content:"";position:absolute;inset:0;z-index:10;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.09),transparent 16%,transparent 84%,rgba(255,255,255,.06)),repeating-linear-gradient(0deg,rgba(255,255,255,.032) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.35}
+body.desktop-nextgen .art-stage:after{content:"";position:absolute;inset:auto 0 0;height:48%;z-index:6;pointer-events:none;background:linear-gradient(to top,rgba(5,7,9,.84),transparent)}
+#v47Cinematic{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;opacity:.92;mix-blend-mode:screen;filter:saturate(1.2) contrast(1.07)}
+#v47Chrome{position:absolute;right:14px;bottom:14px;z-index:15;pointer-events:none;display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid rgba(129,225,238,.42);border-radius:999px;background:rgba(4,12,18,.64);backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 12px 36px rgba(0,0,0,.45),0 0 24px rgba(104,226,241,.12);color:#b9f5ff;font:800 10px/1 ui-sans-serif,system-ui;letter-spacing:.14em;text-transform:uppercase}
+#v47Chrome i{width:7px;height:7px;border-radius:50%;background:#71f3c7;box-shadow:0 0 12px #71f3c7}
+body.desktop-nextgen .pc-render-badge,body.desktop-nextgen .v4-render-badge{border-color:rgba(117,230,241,.38);background:rgba(4,13,19,.62);color:#c5f8ff;backdrop-filter:blur(14px)}
+body.desktop-nextgen .scene-label{left:18px;right:18px;bottom:16px;z-index:16;border-radius:16px;border-color:rgba(236,200,116,.28);background:linear-gradient(90deg,rgba(5,8,13,.80),rgba(19,28,34,.42));box-shadow:0 16px 40px rgba(0,0,0,.42);backdrop-filter:blur(18px) saturate(1.35)}
+body.desktop-nextgen .scene-label b{font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:16px;letter-spacing:.18em;color:#ffe4a5}
+body.desktop-nextgen .scene-label span{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#b9d0d4}
+body.desktop-nextgen .grid{grid-template-columns:290px minmax(0,1fr) 300px;gap:16px}
+body.desktop-nextgen .panel,body.desktop-nextgen #v46TopBar,body.desktop-nextgen .tabs.v43-dock.v44-dock,body.desktop-nextgen .card,body.desktop-nextgen .v4-card,body.desktop-nextgen .v3-card,body.desktop-nextgen .v44-panel,body.desktop-nextgen .v44-map-panel,body.desktop-nextgen .v44-side-panel,body.desktop-nextgen .v43-side-card,body.desktop-nextgen .v43-map-card{border-color:rgba(180,216,223,.16);background:linear-gradient(180deg,rgba(28,35,40,.78),rgba(9,12,16,.82));box-shadow:0 20px 55px rgba(0,0,0,.42),0 1px 0 rgba(255,255,255,.06) inset;backdrop-filter:blur(18px) saturate(1.22)}
+body.desktop-nextgen .panel{border-radius:16px}
+body.desktop-nextgen .card,body.desktop-nextgen .v4-card,body.desktop-nextgen .v3-card{border-radius:12px}
+body.desktop-nextgen h2,body.desktop-nextgen h3,body.desktop-nextgen .card b,body.desktop-nextgen .v44-head h3{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#ffe09a}
+body.desktop-nextgen h2{border-bottom-color:rgba(148,210,222,.16)}
+body.desktop-nextgen .small,body.desktop-nextgen .meter,body.desktop-nextgen .stat span{color:#adc0c0}
+body.desktop-nextgen .bar,body.desktop-nextgen #log{border-color:rgba(138,190,200,.20);background:rgba(4,7,10,.68);box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
+body.desktop-nextgen .fill{filter:saturate(1.18);box-shadow:0 0 16px rgba(226,111,90,.25)}
+body.desktop-nextgen .fill.energy{box-shadow:0 0 16px rgba(116,213,154,.24)}
+body.desktop-nextgen .fill.xp{box-shadow:0 0 16px rgba(230,196,108,.24)}
+body.desktop-nextgen .v44-dock .v43-tab{min-height:74px;border-radius:16px;border-color:rgba(142,206,217,.18);background:linear-gradient(180deg,rgba(30,42,48,.72),rgba(9,13,18,.80));box-shadow:0 14px 34px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.06) inset}
+body.desktop-nextgen .v44-dock .v43-tab.active{border-color:rgba(255,221,142,.54);background:linear-gradient(180deg,rgba(89,69,37,.76),rgba(32,23,16,.84));box-shadow:0 16px 38px rgba(0,0,0,.34),0 0 28px rgba(229,180,86,.14)}
+body.desktop-nextgen .v43-tab .ico{background:rgba(5,12,16,.56);box-shadow:0 0 20px rgba(111,223,239,.12)}
+body.desktop-nextgen .btn,body.desktop-nextgen .choice,body.desktop-nextgen .v44-tile,body.desktop-nextgen .v44-act,body.desktop-nextgen .v44-province-btn,body.desktop-nextgen .origin{border-color:rgba(168,218,226,.20);background:linear-gradient(180deg,rgba(35,48,55,.88),rgba(13,17,23,.92));box-shadow:0 10px 24px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.06) inset;color:#eef3ee}
+body.desktop-nextgen .btn.primary,body.desktop-nextgen .tab.active{border-color:rgba(255,219,139,.55);background:linear-gradient(180deg,#8b483f,#3b1b19)}
+body.desktop-nextgen .btn.good{background:linear-gradient(180deg,#2f6f52,#13271e)}
+body.desktop-nextgen .btn.blue{background:linear-gradient(180deg,#246079,#0c2431)}
+body.desktop-nextgen .btn:hover,body.desktop-nextgen .choice:hover,body.desktop-nextgen .v44-tile:hover,body.desktop-nextgen .v44-act:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(0,0,0,.42),0 0 0 1px rgba(255,225,157,.20) inset,0 0 28px rgba(107,223,238,.10)}
+body.desktop-nextgen .v44-tile:before,body.desktop-nextgen .card:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,rgba(255,255,255,.10),transparent 28%,transparent 72%,rgba(111,230,244,.06));pointer-events:none;opacity:.55}
+body.desktop-nextgen .card,body.desktop-nextgen .v44-tile{position:relative;overflow:hidden}
+body.desktop-nextgen .v44-map{border-color:rgba(120,223,239,.30);box-shadow:0 22px 65px rgba(0,0,0,.40),0 0 55px rgba(77,202,228,.10);filter:saturate(1.18) contrast(1.06)}
+body.desktop-nextgen .v44-map .province{stroke-width:1.5;filter:drop-shadow(0 1px 1px rgba(0,0,0,.38))}
+body.desktop-nextgen .v44-map .province:hover,body.desktop-nextgen .v44-map .province.active{filter:brightness(1.25) saturate(1.25) drop-shadow(0 0 11px rgba(255,232,159,.40))}
+body.desktop-nextgen .v44-chamber,body.desktop-nextgen .v44-war-map{box-shadow:inset 0 0 70px rgba(0,0,0,.64),0 20px 60px rgba(0,0,0,.40),0 0 60px rgba(105,224,240,.10);filter:saturate(1.16) contrast(1.04)}
+body.desktop-nextgen .v44-seat{box-shadow:0 0 14px rgba(255,214,133,.18)}
+body.desktop-nextgen .v44-front-node,body.desktop-nextgen .v45-risk-pin,.v41-hotspot{z-index:18}
+body.desktop-nextgen .modal-card{border-color:rgba(255,218,139,.64);background:linear-gradient(180deg,rgba(34,39,42,.94),rgba(11,13,17,.96));box-shadow:0 34px 110px rgba(0,0,0,.78),0 0 70px rgba(111,223,239,.12);backdrop-filter:blur(22px)}
+}
+@media(max-width:999px),(pointer:coarse),(prefers-reduced-motion:reduce){
+#v47Cinematic,#v47Chrome{display:none!important}
+}
+</style>
+<script id="v47-desktop-graphics">
+(()=>{
+'use strict';
+const G={ready:false,canvas:null,ctx:null,w:1,h:1,dpr:1,scene:'Capital',t:0,mouse:[.5,.5],particles:[],lanes:[],rings:[],last:0};
+const PALETTES={
+ Capital:['#65e2ef','#f1c66c','#c84b55'],Character:['#86f0c0','#f0c46c','#6a8cff'],Senate:['#f2d27c','#73e4f1','#bc5360'],
+ 'Imperial Council':['#dec06a','#a1e8ff','#8f69ff'],Provinces:['#63dfc0','#f1d174','#4a9ee8'],Campaign:['#f0c66a','#db5b66','#72e9f2'],
+ 'War Room':['#f05e55','#f0c66a','#67d9ef'],Military:['#7de0ff','#f25d55','#9ccf6a'],Diplomacy:['#82ebd8','#c99dff','#f0c66a'],
+ Missions:['#f0c66a','#72d5ff','#ef6b81'],Estate:['#89dd8a','#f1c66c','#70d6ff'],Research:['#76e8ff','#c093ff','#f1c66c'],
+ People:['#f1c66c','#7ee0b1','#ef6f7f'],Legacy:['#f1d27a','#ffffff','#70d6ff'],Journal:['#f1c66c','#a5d7ff','#b17bff'],Chronicle:['#f1c66c','#79e9f4','#ef725d']
+};
+function desktop(){return !window.matchMedia||matchMedia('(min-width:1000px) and (pointer:fine) and (prefers-reduced-motion:no-preference)').matches}
+function safeScene(){try{return typeof currentTab==='string'?currentTab:'Capital'}catch(e){return 'Capital'}}
+function palette(){return PALETTES[G.scene]||PALETTES.Capital}
+function init(){
+ if(G.ready||!desktop())return;
+ const stage=document.getElementById('artStage');if(!stage)return;
+ let c=document.getElementById('v47Cinematic');if(!c){c=document.createElement('canvas');c.id='v47Cinematic';stage.appendChild(c)}
+ let badge=document.getElementById('v47Chrome');if(!badge){badge=document.createElement('div');badge.id='v47Chrome';badge.innerHTML='<i></i><span>Modern Desktop Renderer</span>';stage.appendChild(badge)}
+ G.canvas=c;G.ctx=c.getContext('2d');if(!G.ctx)return;
+ G.ready=true;G.scene=safeScene();document.body.classList.add('desktop-nextgen');seed();
+ stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect();G.mouse=[Math.max(0,Math.min(1,(e.clientX-r.left)/Math.max(1,r.width))),Math.max(0,Math.min(1,(e.clientY-r.top)/Math.max(1,r.height)))]},{passive:true});
+ stage.addEventListener('pointerdown',e=>{const r=stage.getBoundingClientRect();pulse((e.clientX-r.left)/Math.max(1,r.width),(e.clientY-r.top)/Math.max(1,r.height))},{passive:true});
+ addEventListener('resize',()=>{fit();document.body.classList.toggle('desktop-nextgen',desktop())},{passive:true});
+ requestAnimationFrame(frame);
+}
+function seed(){
+ G.particles=[];G.lanes=[];G.rings=[];
+ for(let i=0;i<130;i++)G.particles.push({x:Math.random(),y:Math.random(),z:Math.random(),s:.4+Math.random()*2.4,v:.08+Math.random()*.34,a:.25+Math.random()*.55});
+ for(let i=0;i<18;i++)G.lanes.push({x:Math.random(),y:.56+Math.random()*.36,o:Math.random()*6.28,v:.18+Math.random()*.38,len:.08+Math.random()*.16});
+}
+function fit(){
+ const c=G.canvas;if(!c)return false;
+ const r=c.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1),w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));
+ if(c.width!==w||c.height!==h){c.width=w;c.height=h;G.dpr=d;G.w=w;G.h=h}
+ return true;
+}
+function pulse(x,y){G.rings.push({x:Math.max(0,Math.min(1,x)),y:Math.max(0,Math.min(1,y)),r:.01,a:1});G.rings=G.rings.slice(-8)}
+function line(ctx,x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function drawGrid(ctx,w,h,p){
+ ctx.save();ctx.globalAlpha=.33;ctx.strokeStyle=p[0];ctx.lineWidth=1*G.dpr;
+ const horizon=h*.58,step=w/18;
+ for(let i=-18;i<37;i++){let x=i*step+(G.t*26%step);line(ctx,x,h*.98,w*.5+(x-w*.5)*.18,horizon)}
+ for(let j=0;j<13;j++){let y=horizon+Math.pow(j/12,1.9)*h*.40;line(ctx,0,y,w,y)}
+ ctx.restore();
+}
+function drawSkyline(ctx,w,h,p){
+ ctx.save();const base=h*.62;ctx.fillStyle='rgba(3,7,11,.74)';
+ for(let i=0;i<42;i++){let bw=w/50+(i%5)*2*G.dpr,bh=h*(.09+((i*37)%100)/100*.25),x=i*w/41-bw*.5,y=base-bh;ctx.fillRect(x,y,bw,bh);if(i%4===0){ctx.fillStyle=p[1];ctx.globalAlpha=.16;ctx.fillRect(x+bw*.22,y+bh*.16,bw*.18,bh*.62);ctx.globalAlpha=1;ctx.fillStyle='rgba(3,7,11,.74)'}}
+ ctx.strokeStyle=p[0];ctx.globalAlpha=.24;ctx.lineWidth=1.5*G.dpr;for(let i=0;i<8;i++){let y=base-h*(.06+i*.035);line(ctx,w*.04,y,w*.96,y+Math.sin(G.t+i)*7*G.dpr)}
+ ctx.restore();
+}
+function drawParticles(ctx,w,h,p,dt){
+ ctx.save();ctx.globalCompositeOperation='lighter';
+ G.particles.forEach(pt=>{pt.x+=pt.v*dt*.018*(.35+pt.z);if(pt.x>1.08)pt.x=-.08;let x=pt.x*w,y=pt.y*h*.58+Math.sin(G.t*.9+pt.z*9)*7*G.dpr,r=pt.s*G.dpr*(.55+pt.z);ctx.globalAlpha=pt.a*(.35+pt.z*.6);ctx.fillStyle=pt.z>.62?p[0]:p[1];ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()});
+ G.lanes.forEach(l=>{l.x+=l.v*dt*.018;if(l.x>1.18)l.x=-.18;let y=l.y*h+Math.sin(G.t+l.o)*8*G.dpr,x=l.x*w;ctx.strokeStyle=l.y>.75?p[1]:p[0];ctx.globalAlpha=.34;ctx.lineWidth=(1.2+l.y*2)*G.dpr;line(ctx,x,y,x+l.len*w,y-12*G.dpr)});
+ ctx.restore();
+}
+function drawRings(ctx,w,h,p,dt){
+ ctx.save();ctx.globalCompositeOperation='lighter';
+ G.rings.forEach(r=>{r.r+=dt*.00055;r.a-=dt*.0007;ctx.globalAlpha=Math.max(0,r.a);ctx.strokeStyle=p[1];ctx.lineWidth=2*G.dpr;ctx.beginPath();ctx.arc(r.x*w,r.y*h,r.r*Math.min(w,h),0,Math.PI*2);ctx.stroke()});
+ G.rings=G.rings.filter(r=>r.a>0);
+ ctx.restore();
+}
+function draw(now){
+ if(!G.ctx||!fit())return;
+ const ctx=G.ctx,w=G.w,h=G.h,p=palette(),dt=Math.min(48,now-(G.last||now));G.last=now;G.t=now/1000;
+ ctx.clearRect(0,0,w,h);
+ let sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'rgba(9,18,29,.82)');sky.addColorStop(.46,'rgba(6,10,17,.10)');sky.addColorStop(1,'rgba(1,3,5,.82)');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+ ctx.save();ctx.globalCompositeOperation='lighter';let glow=ctx.createRadialGradient(w*(.18+G.mouse[0]*.18),h*.12,0,w*(.18+G.mouse[0]*.18),h*.12,w*.62);glow.addColorStop(0,p[0]+'45');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);let red=ctx.createRadialGradient(w*.78,h*.24,0,w*.78,h*.24,w*.48);red.addColorStop(0,p[2]+'30');red.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=red;ctx.fillRect(0,0,w,h);ctx.restore();
+ drawSkyline(ctx,w,h,p);drawGrid(ctx,w,h,p);drawParticles(ctx,w,h,p,dt);drawRings(ctx,w,h,p,dt);
+ ctx.save();ctx.globalAlpha=.28;ctx.strokeStyle=p[1];ctx.lineWidth=1.3*G.dpr;for(let i=0;i<7;i++){let y=h*(.22+i*.052)+Math.sin(G.t+i)*5*G.dpr;ctx.beginPath();ctx.moveTo(w*.08,y);ctx.bezierCurveTo(w*.32,y-h*.09,w*.66,y+h*.09,w*.92,y);ctx.stroke()}ctx.restore();
+}
+function frame(now){if(!G.ready)return;draw(now||performance.now());requestAnimationFrame(frame)}
+function updateScene(name){G.scene=name||safeScene();if(G.ready){seed();pulse(.5,.58)}}
+function enhance(){
+ const on=desktop();document.body.classList.toggle('desktop-nextgen',on);if(on)init();
+ if(typeof S!=='undefined'&&S)S.version='5.0';
+ const sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul';
+ const title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';
+ document.querySelectorAll('.v44-map,.v44-chamber,.v44-war-map,.v45-portrait').forEach(el=>{el.dataset.v47='1'});
+}
+const prevScene=window.setGraphicScene;window.setGraphicScene=function(name){if(prevScene)prevScene(name);updateScene(name);requestAnimationFrame(enhance)};
+const prevTab=window.tab;window.tab=function(name){prevTab(name);updateScene(name);requestAnimationFrame(enhance)};
+const prevRender=window.render;window.render=function(){let out=prevRender();requestAnimationFrame(enhance);return out};
+function boot(){enhance();updateScene(safeScene())}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
+})();
+</script>
+<style id="v48-gameplay-style">
+/* V4.8 dynamic gameplay systems */
+.v48-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v48-wide{grid-column:1/-1}
+.v48-card{position:relative;border:1px solid #5b6a5f;border-radius:14px;background:linear-gradient(180deg,#171d1b,#0f1111);padding:12px;overflow:hidden;box-shadow:0 14px 28px #0005}
+.v48-card:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,#ffffff0e,transparent 36%,#79e7f50a);pointer-events:none}
+.v48-card h3{margin-top:0}.v48-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px dotted #435147;padding:6px 0}.v48-row:last-child{border-bottom:0}
+.v48-meter{height:10px;border:1px solid #506355;border-radius:999px;background:#070909;overflow:hidden;margin:6px 0 8px}.v48-meter i{display:block;height:100%;background:linear-gradient(90deg,#68d7aa,#e9c66d);box-shadow:0 0 14px #68d7aa55}.v48-meter.danger i{background:linear-gradient(90deg,#e06457,#f0c66a)}
+.v48-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.v48-actions.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.v48-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #52675e;border-radius:999px;background:#09100f;padding:4px 7px;color:#cbd9cf;font:11px system-ui,sans-serif;margin:2px}.v48-pill.hot{border-color:#9c5049;color:#ffc0b8}.v48-pill.good{border-color:#4e805f;color:#bdf3c7}
+.v48-risk{border-color:#8b514b;background:linear-gradient(180deg,#231313,#101010)}.v48-calm{border-color:#4f735a;background:linear-gradient(180deg,#142017,#0d1110)}
+.v48-mini-map{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:9px}.v48-node{min-height:34px;border:1px solid #4d5d58;border-radius:9px;background:#0b1112;padding:4px;text-align:center;font:10px system-ui,sans-serif;color:#c8d4ce}.v48-node.active{border-color:#e2c36f;color:#ffe2a2;box-shadow:0 0 18px #e2c36f20}.v48-node.bad{border-color:#c15f57;color:#ffb8ad}
+.v48-augment{margin-top:14px;border:1px solid #4f6059;border-radius:14px;background:linear-gradient(180deg,#121817,#0b0d0d);padding:12px}.v48-augment h3{margin-top:0}
+.v48-ledger{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.v48-ledger div{border:1px solid #3e4f49;border-radius:10px;background:#090d0d;padding:8px;text-align:center}.v48-ledger b{display:block;color:#f0cd78;font-size:20px}
+@media(max-width:900px){.v48-grid{grid-template-columns:1fr}.v48-actions,.v48-actions.two{grid-template-columns:1fr 1fr}.v48-ledger{grid-template-columns:1fr 1fr}.v48-mini-map{grid-template-columns:repeat(3,1fr)}}
+</style>
+<script id="v48-dynamic-gameplay">
+(()=>{
+'use strict';
+const V48_TABS=[
+ ['Capital','🏛','Capital'],['Situation','◈','Situation'],['Intrigue','🕶','Intrigue'],['Character','👤','Character'],['Senate','🗳️','Senate'],['Imperial Council','👑','Council'],['Provinces','🗺️','Map'],['Campaign','📣','Campaign'],['War Room','⚔️','War'],['Military','🛡','Military'],['Diplomacy','🤝','Diplomacy'],['Missions','✦','Missions'],['Estate','🏡','Estate'],['Research','⚙️','Research'],['People','👥','People'],['Legacy','🏅','Legacy'],['Journal','📖','Journal'],['Chronicle','📜','Chronicle']
+];
+const CRISES=[
+ {id:'grain',title:'Grain Algorithm Failure',domain:'welfare',targets:['Aegyptus','Africa','Syria'],stat:'unrest',text:'Automated grain routing is starving dense districts while warehouses remain full.'},
+ {id:'frontier',title:'Frontier Command Fracture',domain:'military',targets:['Germania','Dacia','Armenia'],stat:'military',text:'Competing commanders are hiding losses and hoarding drone reserves.'},
+ {id:'currency',title:'Provincial Currency Panic',domain:'economy',targets:['Hispania','Gallia','Britannia'],stat:'economy',text:'Local banks are freezing credit after rumors of an imperial tax seizure.'},
+ {id:'cult',title:'Unauthorized Oracle Cult',domain:'faith',targets:['Graecia','Italia','Arabia'],stat:'loyalty',text:'A machine-augur movement is pulling citizens away from official temples.'},
+ {id:'data',title:'Civic Data Plague',domain:'science',targets:['Italia','Graecia','Aegyptus'],stat:'stability',text:'Identity ledgers are producing false debts, duplicate citizens and illegal arrests.'},
+ {id:'succession',title:'Succession Rumor Cascade',domain:'palace',targets:['Italia','Syria','Mauretania'],stat:'loyalty',text:'Encrypted palace gossip is being traded like currency across the senatorial class.'}
+];
+const RIVAL_NAMES=['Lucius Aurelian','Vibia Scaevola','Gaius Lentulus','Junia Sabina','Decimus Corvinus','Aelia Drusilla','Tiberius Naso','Marcia Falco'];
+const SCHEMES=['funding opposition media','buying provincial governors','burying Senate evidence','feeding rumors to the palace','hoarding military contracts','sponsoring street agitators'];
+const PROJECTS={
+ aqueduct:{name:'Quantum Aqueduct',cost:420,stat:'economy',desc:'Raises economy and lowers unrest through infrastructure.'},
+ tribunal:{name:'Circuit Tribunal',cost:340,stat:'loyalty',desc:'Improves loyalty and reduces corruption pressure.'},
+ limes:{name:'Drone Limes',cost:520,stat:'military',desc:'Improves military readiness and slows frontier crises.'},
+ academy:{name:'Provincial Academy',cost:460,stat:'learning',desc:'Improves economy and creates research momentum.'}
+};
+const AMBITIONS=[
+ {id:'stabilizer',name:'Stabilizer of the Imperium',desc:'Resolve 3 crises and keep average unrest below 35.',progress:s=>Math.min(100,Math.round((s.v48.resolved/3)*70+(avgProvince('unrest')<35?30:0))),done:s=>s.v48.resolved>=3&&avgProvince('unrest')<35,reward:s=>{s.influence+=55;s.maxEnergy+=1;s.energy=s.maxEnergy}},
+ {id:'architect',name:'Provincial Architect',desc:'Complete 4 province projects and raise average loyalty to 55.',progress:s=>Math.min(100,Math.round((s.v48.completedProjects/4)*70+(avgProvince('loyalty')>=55?30:0))),done:s=>s.v48.completedProjects>=4&&avgProvince('loyalty')>=55,reward:s=>{s.money+=900;s.provinceSupport+=18}},
+ {id:'spymaster',name:'Master of Intrigue',desc:'Turn or neutralize 3 rival schemes.',progress:s=>Math.min(100,Math.round((s.v48.rivalsHandled/3)*100)),done:s=>s.v48.rivalsHandled>=3,reward:s=>{s.influence+=45;s.scandal=Math.max(0,s.scandal-5);s.v48.intel+=25}},
+ {id:'reformer',name:'Constitutional Reformer',desc:'Pass 5 laws while corruption is below 42.',progress:s=>Math.min(100,Math.round((s.billsPassed/5)*70+(s.corruption<42?30:0))),done:s=>s.billsPassed>=5&&s.corruption<42,reward:s=>{s.factions.Populists=clamp(s.factions.Populists+12,0,100);s.factions.Technocrats=clamp(s.factions.Technocrats+12,0,100);s.influence+=35}},
+ {id:'war',name:'War Statesman',desc:'Raise military to 72 and defeat 8 enemies or win 2 wars.',progress:s=>Math.min(100,Math.round((s.world.military/72)*55+Math.min(45,Math.max(s.enemiesDefeated/8,(s.v3?.warsWon||0)/2)*45))),done:s=>s.world.military>=72&&(s.enemiesDefeated>=8||(s.v3?.warsWon||0)>=2),reward:s=>{s.favor+=22;s.world.military=clamp(s.world.military+8,0,100);s.strategy+=1}}
+];
+function pay(c){
+ ensure48();let miss=[];
+ if((S.energy||0)<(c.energy||0))miss.push(`${c.energy} energy`);
+ if((S.money||0)<(c.money||0))miss.push(`${c.money} denarii`);
+ if((S.influence||0)<(c.influence||0))miss.push(`${c.influence} influence`);
+ if((S.favor||0)<(c.favor||0))miss.push(`${c.favor} imperial favor`);
+ if((S.v48.intel||0)<(c.intel||0))miss.push(`${c.intel} intelligence`);
+ if(miss.length){toast(`Need ${miss.join(', ')}.`);return false}
+ S.energy-=c.energy||0;S.money-=c.money||0;S.influence-=c.influence||0;S.favor-=c.favor||0;S.v48.intel-=c.intel||0;return true;
+}
+function cost(c){let a=[];if(c.energy)a.push(`${c.energy} EN`);if(c.money)a.push(`${c.money} D`);if(c.influence)a.push(`${c.influence} INF`);if(c.favor)a.push(`${c.favor} FAV`);if(c.intel)a.push(`${c.intel} INT`);return a.length?`<span class="v46-cost">${a.join(' • ')}</span>`:''}
+function pct(n){return clamp(Math.round(n),0,100)}
+function choose(a){return a[Math.floor(Math.random()*a.length)]}
+function ensure48(){
+ if(typeof S==='undefined'||!S)return;
+ S.version='5.0';
+ S.v48=S.v48||{crises:[],rivals:[],directive:'balanced',resolved:0,failed:0,intel:10,cohesion:50,lastTick:S.day,history:[],provinceProjects:{},completedProjects:0,rivalsHandled:0,ambition:null,completedAmbitions:[],campaignIntel:null,marketShield:0,researchMomentum:0};
+ if(!Array.isArray(S.v48.crises))S.v48.crises=[];
+ if(!Array.isArray(S.v48.rivals))S.v48.rivals=[];
+ if(!S.v48.rivals.length)makeRivals();
+ if(!S.v48.directive)S.v48.directive='balanced';
+ provinces.forEach(n=>{if(!S.v48.provinceProjects[n])S.v48.provinceProjects[n]=null});
+ if(!S.v48.crises.length)spawnCrisis();
+ clamp48();
+}
+function clamp48(){
+ if(!S?.v48)return;
+ S.v48.intel=clamp(Math.round(S.v48.intel||0),0,100);S.v48.cohesion=clamp(Math.round(S.v48.cohesion||0),0,100);
+ ['money','influence','favor','popularity','scandal','corruption','provinceSupport'].forEach(k=>S[k]=Math.max(0,Math.round(S[k]||0)));
+ Object.keys(S.world||{}).forEach(k=>S.world[k]=clamp(Math.round(S.world[k]||0),0,1000));
+ Object.values(S.provinces||{}).forEach(p=>['loyalty','economy','unrest','military'].forEach(k=>p[k]=clamp(Math.round(p[k]||0),0,100)));
+ Object.keys(S.factions||{}).forEach(k=>S.factions[k]=clamp(Math.round(S.factions[k]||0),0,100));
+}
+function makeRivals(){
+ let factions=Object.keys(S.factions||{}),names=RIVAL_NAMES.slice().sort(()=>Math.random()-.5);
+ S.v48.rivals=names.slice(0,4).map((name,i)=>({name,faction:factions[i%factions.length]||'Traditionalists',scheme:SCHEMES[i%SCHEMES.length],progress:18+roll(24),threat:3+roll(5),relation:-20+roll(35),leverage:roll(14),status:'active'}));
+}
+function spawnCrisis(){
+ if(!S?.v48||S.v48.crises.length>=3)return;
+ let used=new Set(S.v48.crises.map(c=>c.id)),pool=CRISES.filter(c=>!used.has(c.id));if(!pool.length)pool=CRISES;
+ let t=choose(pool),target=choose(t.targets),key=`${t.id}-${S.day}-${roll(999)}`;
+ S.v48.crises.push({key,id:t.id,title:t.title,domain:t.domain,target,stat:t.stat,text:t.text,clock:6+roll(7),heat:20+roll(28),progress:0,severity:1+roll(3)});
+ addLog(`<span class="gold">New imperial crisis:</span> ${t.title} in ${target}.`);
+}
+function directiveText(){
+ return {balanced:'No empire-wide posture is overriding local judgment.',relief:'Daily treasury spending lowers unrest but slows income.',security:'Military posture improves control but reduces popularity.',markets:'Market liberalization raises revenue and corruption pressure.',courts:'Anti-corruption courts reduce corruption but consume influence.'}[S.v48.directive]||'';
+}
+function applyDirective(){
+ let d=S.v48.directive;
+ if(d==='relief'){S.money=Math.max(0,S.money-55);Object.values(S.provinces).forEach(p=>p.unrest-=1);S.popularity+=1}
+ if(d==='security'){S.world.military+=1;S.favor+=1;S.popularity=Math.max(0,S.popularity-1);Object.values(S.provinces).forEach(p=>p.unrest=Math.max(0,p.unrest-1))}
+ if(d==='markets'){S.money+=45+roll(55);S.world.economy+=1;S.corruption+=Math.random()<.55?1:0}
+ if(d==='courts'){S.influence=Math.max(0,S.influence-1);S.corruption=Math.max(0,S.corruption-1);if(Math.random()<.18)S.scandal+=1}
+}
+function tick48(){
+ if(!S?.v48||S.v48.lastTick===S.day)return;
+ let days=clamp(S.day-S.v48.lastTick,1,14);S.v48.lastTick=S.day;
+ for(let i=0;i<days;i++)tickOne48();
+ clamp48();checkAmbition();
+}
+function tickOne48(){
+ applyDirective();
+ if(S.v48.crises.length<2&&Math.random()<.36)spawnCrisis();
+ S.v48.crises.slice().forEach(c=>{
+  c.clock--;c.heat=clamp(c.heat+roll(7)-3-c.progress/40,0,100);
+  let p=S.provinces[c.target];if(p&&c.heat>55){p.unrest+=1;if(c.stat==='economy')p.economy-=1;if(c.stat==='military')p.military-=1;if(c.stat==='loyalty')p.loyalty-=1}
+  if(c.clock<=0)failCrisis(c.key);
+ });
+ S.v48.rivals.forEach(r=>{
+  if(r.status!=='active')return;
+  r.progress+=Math.max(1,Math.round(r.threat/2))+roll(3)+(r.relation<-15?1:0);
+  if(r.progress>=100)fireScheme(r);
+ });
+ Object.entries(S.v48.provinceProjects).forEach(([n,p])=>{
+  if(!p)return;let prov=S.provinces[n],boost=5+Math.floor((prov.economy+prov.loyalty)/45)+(S.v48.researchMomentum>0?2:0);p.progress+=boost;p.days++;
+  if(p.progress>=100)completeProject(n);
+ });
+ if(S.v48.marketShield>0)S.v48.marketShield--;
+ if(S.v48.researchMomentum>0)S.v48.researchMomentum--;
+}
+function fireScheme(r){
+ r.progress=18+roll(18);r.threat=clamp(r.threat+1,1,10);
+ let f=S.factions[r.faction];if(f!=null)S.factions[r.faction]=clamp(f-4-roll(4),0,100);
+ S.scandal+=1;S.influence=Math.max(0,S.influence-2);
+ let n=choose(provinces),p=S.provinces[n];if(p)p.unrest+=2;
+ addLog(`<span class="bad-text">${r.name}'s scheme lands:</span> ${r.scheme}.`);
+}
+function resolveCrisis(key){
+ let i=S.v48.crises.findIndex(c=>c.key===key);if(i<0)return;let c=S.v48.crises.splice(i,1)[0],p=S.provinces[c.target];
+ S.v48.resolved++;S.v48.history.unshift({day:S.day,text:`Resolved ${c.title} in ${c.target}`});S.v48.history=S.v48.history.slice(0,20);
+ if(p){p.loyalty+=4;p.unrest-=6;if(c.stat==='economy')p.economy+=4;if(c.stat==='military')p.military+=4}
+ S.influence+=8+c.severity*3;S.popularity+=2;S.v48.cohesion+=3;gainXP(25+c.severity*8);
+ addLog(`<span class="good-text">${c.title} is resolved in ${c.target}.</span>`);
+}
+function failCrisis(key){
+ let i=S.v48.crises.findIndex(c=>c.key===key);if(i<0)return;let c=S.v48.crises.splice(i,1)[0],p=S.provinces[c.target];
+ S.v48.failed++;S.v48.history.unshift({day:S.day,text:`Failed ${c.title} in ${c.target}`});S.v48.history=S.v48.history.slice(0,20);
+ if(p){p.unrest+=10+c.severity*2;p.loyalty-=5;if(c.stat==='economy')p.economy-=8;if(c.stat==='military')p.military-=8}
+ S.world.stability-=4+c.severity;S.scandal+=2;S.v48.cohesion-=6;
+ addLog(`<span class="bad-text">${c.title} boils over in ${c.target}.</span>`);
+}
+function checkRoll(stat,diff){return typeof check==='function'?check(stat,diff):roll(12)+(S[stat]||0)>=diff}
+window.v48CrisisAction=function(key,type){
+ ensure48();let c=S.v48.crises.find(x=>x.key===key);if(!c)return toast('That crisis has already moved on.');
+ let ok=false,gain=0;
+ if(type==='relief'){if(!pay({energy:1,money:220}))return;gain=16+roll(14);S.popularity+=1}
+ if(type==='negotiate'){if(!pay({energy:2,influence:6}))return;ok=checkRoll('charisma',12+c.severity);gain=ok?22+roll(14):7+roll(7);S.v48.intel+=ok?4:1}
+ if(type==='deploy'){if(!pay({energy:1,favor:4}))return;ok=checkRoll('strategy',12+c.severity);gain=ok?20+roll(15):7+roll(8);S.favor+=ok?1:0;S.scandal+=ok?0:1}
+ if(type==='investigate'){if(!pay({energy:1,intel:8}))return;ok=checkRoll('learning',11+c.severity);gain=ok?24+roll(14):8;S.corruption=Math.max(0,S.corruption-(ok?1:0))}
+ c.progress=clamp(c.progress+gain,0,100);c.heat=clamp(c.heat-Math.round(gain/2),0,100);addLog(`Crisis action advances ${c.title}: +${gain} control.`);
+ if(c.progress>=100)resolveCrisis(key);render();
+};
+window.v48SetDirective=function(id){ensure48();S.v48.directive=id;addLog(`Imperial directive set: ${id}.`);render()};
+window.v48Scan=function(){ensure48();if(!pay({energy:1}))return;S.v48.intel=clamp(S.v48.intel+8+roll(6),0,100);if(S.v48.crises.length<2)spawnCrisis();addLog('The risk council updates the imperial threat ledger.');render()};
+window.v48RivalAction=function(i,type){
+ ensure48();let r=S.v48.rivals[i];if(!r)return;let ok=false;
+ if(type==='monitor'){if(!pay({energy:1}))return;ok=checkRoll('learning',11+r.threat);r.leverage+=ok?8:4;r.progress=Math.max(0,r.progress-(ok?14:6));S.v48.intel+=ok?4:1}
+ if(type==='deal'){if(!pay({money:160,influence:4}))return;r.relation+=12;r.threat=clamp(r.threat-1,1,10);r.progress=Math.max(0,r.progress-8)}
+ if(type==='expose'){if(!pay({energy:2,intel:12}))return;ok=checkRoll('rhetoric',12+r.threat);if(ok){r.progress=0;r.threat=clamp(r.threat-2,1,10);r.leverage=0;S.influence+=6;if(!r.handled){S.v48.rivalsHandled++;r.handled=true}}else{S.scandal+=4;r.relation-=12}}
+ if(type==='turn'){if(!pay({influence:12}))return;ok=(r.leverage+S.charisma+roll(12))>26;if(ok){r.status='turned';r.progress=0;r.threat=1;S.factions[r.faction]=clamp(S.factions[r.faction]+8,0,100);if(!r.handled){S.v48.rivalsHandled++;r.handled=true}addLog(`${r.name} becomes an uneasy ally.`)}else{r.relation-=10;r.threat=clamp(r.threat+1,1,10);S.scandal+=1}}
+ if(r.status==='active')addLog(`Intrigue order against ${r.name}: ${type}.`);
+ render();
+};
+window.v48ChooseAmbition=function(id){ensure48();if(S.v48.ambition)return toast('Complete or abandon the current ambition first.');if(S.v48.completedAmbitions.includes(id))return toast('That ambition is already complete.');S.v48.ambition=id;addLog(`New personal ambition: ${AMBITIONS.find(a=>a.id===id)?.name||id}.`);render()};
+window.v48AbandonAmbition=function(){ensure48();if(!S.v48.ambition)return;S.scandal+=1;S.v48.ambition=null;addLog('A public ambition is quietly abandoned.');render()};
+function checkAmbition(){
+ let a=AMBITIONS.find(x=>x.id===S.v48.ambition);if(!a||!a.done(S))return;
+ a.reward(S);S.v48.completedAmbitions.push(a.id);S.v48.ambition=null;addLog(`<span class="good-text">Ambition complete:</span> ${a.name}.`);toast(`Ambition complete: ${a.name}`);
+}
+window.v48StartProject=function(type){
+ ensure48();let n=S.v41?.lastProvince||'Italia',def=PROJECTS[type];if(!def)return;if(S.v48.provinceProjects[n])return toast(`${n} already has an active project.`);
+ if(!pay({energy:1,money:def.cost}))return;S.v48.provinceProjects[n]={type,progress:0,days:0};addLog(`${def.name} begins in ${n}.`);render();
+};
+window.v48RushProject=function(n){ensure48();let p=S.v48.provinceProjects[n];if(!p)return;if(!pay({money:220,influence:4}))return;p.progress+=22;addLog(`Emergency contractors accelerate the ${PROJECTS[p.type].name} in ${n}.`);if(p.progress>=100)completeProject(n);render()};
+function completeProject(n){
+ let p=S.v48.provinceProjects[n],def=p&&PROJECTS[p.type],prov=S.provinces[n];if(!p||!def||!prov)return;
+ if(p.type==='aqueduct'){prov.economy+=6;prov.unrest-=4;S.world.economy+=1}
+ if(p.type==='tribunal'){prov.loyalty+=6;prov.unrest-=3;S.corruption=Math.max(0,S.corruption-1)}
+ if(p.type==='limes'){prov.military+=8;prov.unrest-=2;S.world.military+=1}
+ if(p.type==='academy'){prov.economy+=4;prov.loyalty+=3;S.v48.researchMomentum=5}
+ S.v48.completedProjects++;S.v48.provinceProjects[n]=null;S.provinceSupport+=2;addLog(`<span class="good-text">${def.name} completed in ${n}.</span>`);
+}
+window.v48SenateMove=function(type){
+ ensure48();let agenda=S.v4?.agenda,boost=0,ok=true;
+ if(type==='popular'){if(!pay({energy:1,money:160}))return;boost=6+roll(6);S.popularity+=1}
+ if(type==='technical'){if(!pay({energy:1,intel:8}))return;ok=checkRoll('learning',13);boost=ok?9+roll(6):3;S.corruption=Math.max(0,S.corruption-(ok?1:0))}
+ if(type==='concession'){if(!pay({influence:10}))return;boost=11;S.scandal+=1;let f=Object.keys(S.factions).sort((a,b)=>S.factions[a]-S.factions[b])[0];S.factions[f]=clamp(S.factions[f]+4,0,100)}
+ if(agenda)agenda.support+=boost;else S.influence+=Math.floor(boost/2);
+ addLog(`Senate maneuver adds ${boost} support pressure.`);render();
+};
+window.v48CampaignMove=function(type){
+ ensure48();
+ if(type==='poll'){if(!pay({energy:1,money:90}))return;S.v48.campaignIntel={day:S.day,score:campaignScore(),scandal:S.scandal};S.popularity+=1}
+ if(type==='district'){if(!pay({energy:2,money:220}))return;let n=choose(provinces),p=S.provinces[n];p.loyalty+=3;p.unrest-=2;S.provinceSupport+=3;S.popularity+=1;addLog(`Campaign district teams stabilize ${n}.`)}
+ if(type==='rapid'){if(!pay({energy:1,intel:10}))return;S.scandal=Math.max(0,S.scandal-1);S.popularity+=2}
+ render();
+};
+window.v48Portfolio=function(type){
+ ensure48();
+ if(type==='audit'){if(!pay({energy:1,money:120}))return;S.corruption=Math.max(0,S.corruption-2);S.scandal=Math.max(0,S.scandal-1)}
+ if(type==='hedge'){if(!pay({money:340}))return;S.v48.marketShield=12}
+ if(type==='expand'){if(!pay({money:1200,influence:14}))return;S.businessSlots++;S.corruption+=1}
+ addLog(`Estate portfolio order: ${type}.`);render();
+};
+window.v48Breakthrough=function(type){
+ ensure48();
+ if(type==='prototype'){if(!pay({energy:2,money:320}))return;let ok=checkRoll('learning',14);S.v48.researchMomentum=ok?8:3;S.world.economy+=ok?2:1}
+ if(type==='publish'){if(!pay({energy:1}))return;S.influence+=4+Math.floor(S.learning/3);S.factions.Technocrats=clamp(S.factions.Technocrats+3,0,100)}
+ if(type==='doctrine'){if(!pay({energy:1,money:220}))return;S.world.military+=3;S.strategy+=Math.random()<.14?1:0}
+ addLog(`Research program advanced: ${type}.`);render();
+};
+function situationView(){
+ ensure48();let active=S.v48.crises.map(c=>`<div class="v48-card ${c.heat>65?'v48-risk':''}"><div class="v48-row"><h3>${c.title}</h3><span class="v48-pill ${c.heat>65?'hot':''}">${c.clock}d</span></div><div class="small">${c.text}</div><div class="small">Target: <b>${c.target}</b> • Domain ${c.domain} • Severity ${c.severity}</div><div class="v48-meter"><i style="width:${pct(c.progress)}%"></i></div><div class="small">Control ${pct(c.progress)}% • Heat ${pct(c.heat)}%</div><div class="v48-actions"><button class="btn good" onclick="v48CrisisAction('${c.key}','relief')">Relief ${cost({energy:1,money:220})}</button><button class="btn" onclick="v48CrisisAction('${c.key}','negotiate')">Negotiate ${cost({energy:2,influence:6})}</button><button class="btn blue" onclick="v48CrisisAction('${c.key}','deploy')">Deploy ${cost({energy:1,favor:4})}</button><button class="btn purple" onclick="v48CrisisAction('${c.key}','investigate')">Investigate ${cost({energy:1,intel:8})}</button></div></div>`).join('');
+ let a=AMBITIONS.find(x=>x.id===S.v48.ambition);
+ return `<h2>Imperial Situation</h2><div class="v48-ledger"><div><b>${S.v48.crises.length}</b><span class="small">Crises</span></div><div><b>${S.v48.intel}</b><span class="small">Intel</span></div><div><b>${S.v48.cohesion}</b><span class="small">Cohesion</span></div><div><b>${S.v48.resolved}/${S.v48.failed}</b><span class="small">Resolved/Failed</span></div></div><div class="v48-augment"><h3>Imperial Directive</h3><div class="small">${directiveText()}</div><div class="v48-actions"><button class="btn" onclick="v48SetDirective('balanced')">Balanced</button><button class="btn good" onclick="v48SetDirective('relief')">Relief</button><button class="btn blue" onclick="v48SetDirective('security')">Security</button><button class="btn" onclick="v48SetDirective('markets')">Markets</button><button class="btn purple" onclick="v48SetDirective('courts')">Courts</button><button class="btn primary" onclick="v48Scan()">Risk Scan ${cost({energy:1})}</button></div></div><h3>Active Crises</h3><div class="v48-grid">${active||'<div class="v48-card v48-calm"><h3>No active crisis</h3><div class="small">Use Risk Scan to search for hidden pressure before it erupts.</div></div>'}</div><h3>Personal Ambition</h3>${ambitionHtml(a)}`;
+}
+function ambitionHtml(active){
+ if(active){let p=active.progress(S);return `<div class="v48-card"><h3>${active.name}</h3><div class="small">${active.desc}</div><div class="v48-meter"><i style="width:${p}%"></i></div><button class="btn" onclick="v48AbandonAmbition()">Abandon</button></div>`}
+ return `<div class="v48-grid">${AMBITIONS.filter(a=>!S.v48.completedAmbitions.includes(a.id)).map(a=>`<div class="v48-card"><h3>${a.name}</h3><div class="small">${a.desc}</div><button class="btn primary" onclick="v48ChooseAmbition('${a.id}')">Choose Ambition</button></div>`).join('')||'<div class="small">Every listed ambition is complete.</div>'}</div>`;
+}
+function intrigueView(){
+ ensure48();return `<h2>Intrigue Network</h2><div class="v48-ledger"><div><b>${S.v48.intel}</b><span class="small">Intelligence</span></div><div><b>${S.scandal}</b><span class="small">Scandal</span></div><div><b>${S.v48.rivalsHandled}</b><span class="small">Rivals handled</span></div><div><b>${Math.round(S.v48.rivals.reduce((a,r)=>a+r.progress,0)/Math.max(1,S.v48.rivals.length))}%</b><span class="small">Scheme pressure</span></div></div><div class="v48-grid">${S.v48.rivals.map((r,i)=>`<div class="v48-card ${r.progress>70?'v48-risk':r.status==='turned'?'v48-calm':''}"><div class="v48-row"><h3>${r.name}</h3><span class="v48-pill">${r.status}</span></div><div class="small">${r.faction} rival • ${r.scheme}</div><div class="v48-meter danger"><i style="width:${pct(r.progress)}%"></i></div><div class="v48-row small"><span>Threat ${r.threat}</span><span>Relation ${r.relation}</span><span>Leverage ${r.leverage}</span></div><div class="v48-actions"><button class="btn" onclick="v48RivalAction(${i},'monitor')">Monitor ${cost({energy:1})}</button><button class="btn good" onclick="v48RivalAction(${i},'deal')">Deal ${cost({money:160,influence:4})}</button><button class="btn blue" onclick="v48RivalAction(${i},'expose')">Expose ${cost({energy:2,intel:12})}</button><button class="btn purple" onclick="v48RivalAction(${i},'turn')">Turn ${cost({influence:12})}</button></div></div>`).join('')}</div>`;
+}
+function provinceProjectHtml(){
+ ensure48();let n=S.v41?.lastProvince||'Italia',active=S.v48.provinceProjects[n],nodes=provinces.map(p=>{let pr=S.v48.provinceProjects[p],prov=S.provinces[p],bad=prov.unrest>55||prov.loyalty<35;return `<div class="v48-node ${pr?'active':''} ${bad?'bad':''}">${p.slice(0,3)}<br>${pr?Math.round(pr.progress)+'%':bad?'risk':'-'}</div>`}).join('');
+ return `<div class="v48-augment"><h3>Province Projects: ${n}</h3><div class="small">${active?`${PROJECTS[active.type].name} is ${Math.round(active.progress)}% complete after ${active.days} days.`:'Start a durable provincial project in the selected province.'}</div><div class="v48-mini-map">${nodes}</div><div class="v48-actions">${Object.entries(PROJECTS).map(([id,p])=>`<button class="btn" onclick="v48StartProject('${id}')">${p.name} ${cost({energy:1,money:p.cost})}</button>`).join('')}${active?`<button class="btn primary" onclick="v48RushProject('${n}')">Rush Project ${cost({money:220,influence:4})}</button>`:''}</div></div>`;
+}
+function augmentView(){
+ let view=document.getElementById('view');if(!view||view.dataset.v48)return;view.dataset.v48='1';
+ if(currentTab==='Capital')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Strategic Pressure</h3><div class="v48-ledger"><div><b>${S.v48.crises.length}</b><span class="small">Crises</span></div><div><b>${S.v48.rivals.filter(r=>r.status==='active').length}</b><span class="small">Active rivals</span></div><div><b>${S.v48.directive}</b><span class="small">Directive</span></div><div><b>${S.v48.intel}</b><span class="small">Intel</span></div></div><div class="v48-actions two"><button class="btn primary" onclick="tab('Situation')">Open Situation</button><button class="btn blue" onclick="tab('Intrigue')">Open Intrigue</button></div></div>`);
+ if(currentTab==='Provinces')view.insertAdjacentHTML('beforeend',provinceProjectHtml());
+ if(currentTab==='Senate')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Procedural Senate Maneuvers</h3><div class="small">Amendments now modify the living vote environment instead of being simple flat actions.</div><div class="v48-actions"><button class="btn good" onclick="v48SenateMove('popular')">Popular Amendment ${cost({energy:1,money:130})}</button><button class="btn blue" onclick="v48SenateMove('technical')">Technical Review ${cost({energy:1,intel:6})}</button><button class="btn purple" onclick="v48SenateMove('concession')">Backroom Concession ${cost({influence:8})}</button></div></div>`);
+ if(currentTab==='Campaign')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Dynamic Campaign Operations</h3><div class="small">${S.v48.campaignIntel?`Last poll: ${S.v48.campaignIntel.score}% on day ${S.v48.campaignIntel.day}.`:'No recent polling model.'}</div><div class="v48-actions"><button class="btn" onclick="v48CampaignMove('poll')">Commission Poll ${cost({energy:1,money:90})}</button><button class="btn good" onclick="v48CampaignMove('district')">District Ground Game ${cost({energy:2,money:170})}</button><button class="btn blue" onclick="v48CampaignMove('rapid')">Rapid Response ${cost({energy:1,intel:10})}</button></div></div>`);
+ if(currentTab==='Estate')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Portfolio Risk Desk</h3><div class="small">Market shield: ${S.v48.marketShield} days. Business growth now has governance tradeoffs.</div><div class="v48-actions"><button class="btn" onclick="v48Portfolio('audit')">Audit Holdings ${cost({energy:1,money:120})}</button><button class="btn blue" onclick="v48Portfolio('hedge')">Hedge Markets ${cost({money:260})}</button><button class="btn good" onclick="v48Portfolio('expand')">Expand Charter ${cost({money:900,influence:10})}</button></div></div>`);
+ if(currentTab==='Research')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Breakthrough Lab</h3><div class="small">Research momentum: ${S.v48.researchMomentum} days. Momentum accelerates provincial projects.</div><div class="v48-actions"><button class="btn purple" onclick="v48Breakthrough('prototype')">Prototype Program ${cost({energy:2,money:260})}</button><button class="btn" onclick="v48Breakthrough('publish')">Publish Findings ${cost({energy:1})}</button><button class="btn blue" onclick="v48Breakthrough('doctrine')">Military Doctrine ${cost({energy:1,money:180})}</button></div></div>`);
+}
+function renderTabs48(){
+ ensure48();let hasCouncil=typeof window.ensure4==='function'||!!S.v4;
+ let html=V48_TABS.filter(t=>hasCouncil||t[0]!=='Imperial Council').map(([key,ico,label])=>`<button type="button" class="v43-tab ${currentTab===key?'active':''}" data-tab="${key}" onclick="tab('${key}')"><span class="ico">${ico}</span><span class="lbl">${label}</span>${currentTab===key?'<span class="dot"></span>':''}</button>`).join('');
+ let tabs=$('tabs');tabs.className='tabs v43-dock v44-dock';tabs.innerHTML=html;
+}
+const prevTabs48=window.renderTabs;window.renderTabs=renderTabs48;try{renderTabs=renderTabs48}catch(e){}
+const prevView48=window.renderView;window.renderView=function(){ensure48();if(currentTab==='Situation'){$('view').innerHTML=situationView();return}if(currentTab==='Intrigue'){$('view').innerHTML=intrigueView();return}prevView48();requestAnimationFrame(augmentView)};try{renderView=window.renderView}catch(e){}
+const prevEnd48=window.endDay;window.endDay=function(){ensure48();let before=S.day;prevEnd48();ensure48();if(S.day!==before)tick48();autoSave();render()};try{endDay=window.endDay}catch(e){}
+const prevRender48=window.render;window.render=function(){ensure48();let out=prevRender48();ensure48();requestAnimationFrame(augmentView);return out};try{render=window.render}catch(e){}
+const prevStart48=window.start;window.start=function(){prevStart48();ensure48();render()};try{start=window.start}catch(e){}
+const prevLoad48=window.loadGame;window.loadGame=function(){prevLoad48();setTimeout(()=>{ensure48();render();toast('Save migrated to Version 5.')},0)};try{loadGame=window.loadGame}catch(e){}
+function boot(){if(S){ensure48();render()}let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul'}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
+})();
+</script>
+<style id="v5-rpg-style">
+/* Version 5 RPG overhaul */
+.v5-hero{position:relative;overflow:hidden;border:1px solid #7b8c77;border-radius:16px;background:radial-gradient(circle at 18% 12%,#243b39,#0d1011 62%);padding:14px;margin-bottom:14px;box-shadow:0 18px 38px #0006}
+.v5-hero:after{content:"V";position:absolute;right:16px;top:-30px;font:900 150px Georgia,serif;color:#f1d17a10;pointer-events:none}.v5-hero h2{border:0;margin:0 0 4px}.v5-kicker{font:700 10px system-ui,sans-serif;letter-spacing:1.8px;text-transform:uppercase;color:#8ee6db}
+.v5-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v5-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.v5-card{position:relative;border:1px solid #52675e;border-radius:14px;background:linear-gradient(180deg,#161d1b,#0d1010);padding:12px;overflow:hidden;box-shadow:0 14px 30px #0005}.v5-card.locked{opacity:.58;filter:saturate(.65)}.v5-card h3{margin-top:0}.v5-card b{color:#f0cd78}
+.v5-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px dotted #40524b;padding:6px 0}.v5-row:last-child{border-bottom:0}
+.v5-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #566e64;border-radius:999px;background:#08100f;padding:4px 8px;color:#cce0d8;font:11px system-ui,sans-serif;margin:2px}.v5-pill.good{border-color:#4e805f;color:#bdf3c7}.v5-pill.bad{border-color:#9c5049;color:#ffc0b8}.v5-pill.gold{border-color:#c8a55d;color:#ffe0a0}
+.v5-meter{height:10px;border:1px solid #52665e;border-radius:999px;background:#070909;overflow:hidden;margin:7px 0}.v5-meter i{display:block;height:100%;background:linear-gradient(90deg,#70e3c1,#f0c96e);box-shadow:0 0 14px #70e3c155}.v5-meter.red i{background:linear-gradient(90deg,#de5f56,#f0c96e)}
+.v5-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.v5-actions.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.v5-skill{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:start}.v5-icon{width:42px;height:42px;border:1px solid #6e8a7e;border-radius:12px;display:grid;place-items:center;background:#091312;color:#8ee6db;font-weight:800;box-shadow:0 0 22px #6ce7db18}
+.v5-paths{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.v5-path{min-height:128px}.v5-path.active{border-color:#e7c36c;box-shadow:0 0 28px #e7c36c22}
+.v5-quest{border-left:3px solid #e7c36c}.v5-inventory{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v5-item{border:1px solid #4d6159;border-radius:12px;background:#09100f;padding:9px}
+.v5-portrait-wrap{display:grid;grid-template-columns:190px minmax(0,1fr);gap:12px;align-items:start}.v5-paper{border:1px solid #6b7d6f;border-radius:16px;background:#0a0e0e;padding:10px;text-align:center}.v5-paper canvas{width:100%;height:auto;border-radius:12px;background:#07090b;border:1px solid #4a5b54}
+@media(max-width:1050px){.v5-paths,.v5-grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}.v5-portrait-wrap{grid-template-columns:1fr}}
+@media(max-width:700px){.v5-grid,.v5-grid.three,.v5-actions,.v5-actions.two,.v5-paths,.v5-inventory{grid-template-columns:1fr}.v5-hero:after{font-size:90px}.v5-card{padding:10px}}
+</style>
+<script id="v5-rpg-overhaul">
+(()=>{
+'use strict';
+const V5_TABS=[
+ ['Capital','🏛','Capital'],['Adventures','◆','Adventures'],['Skills','✦','Skills'],['Situation','◈','Situation'],['Intrigue','🕶','Intrigue'],['Character','👤','Character'],['Senate','🗳️','Senate'],['Imperial Council','👑','Council'],['Provinces','🗺️','Map'],['Campaign','📣','Campaign'],['War Room','⚔️','War'],['Military','🛡','Military'],['Diplomacy','🤝','Diplomacy'],['Missions','✦','Missions'],['Estate','🏡','Estate'],['Research','⚙️','Research'],['People','👥','People'],['Legacy','🏅','Legacy'],['Journal','📖','Journal'],['Chronicle','📜','Chronicle']
+];
+const ARCHETYPES={
+ orator:{name:'Forum Orator',tag:'Rhetoric / Popularity',stats:{rhetoric:1,charisma:1},desc:'Public actions, Senate persuasion and crisis negotiation become stronger.'},
+ tribune:{name:'Frontier Tribune',tag:'Combat / Command',stats:{strength:1,strategy:1},desc:'Combat tactics, military responses and bodyguard roles become stronger.'},
+ spymaster:{name:'Veiled Spymaster',tag:'Intrigue / Intel',stats:{learning:1,strategy:1},desc:'Rival operations, investigations and exploration intel gain extra reach.'},
+ scholar:{name:'Imperial Scholar',tag:'Research / Projects',stats:{learning:2},desc:'Research, province projects and strange encounters become more predictable.'},
+ magnate:{name:'Civic Magnate',tag:'Estate / Resources',stats:{charisma:1,endurance:1},desc:'Business, patronage and project funding become more efficient.'}
+};
+const PERKS=[
+ {id:'silver',path:'orator',name:'Silver Tongue',req:1,desc:'Speeches, negotiations and Senate maneuvers gain extra effect.'},
+ {id:'tribune',path:'tribune',name:'Iron Tribune',req:1,desc:'Combat damage rises and incoming combat damage is reduced.'},
+ {id:'cipher',path:'spymaster',name:'Cipher Network',req:1,desc:'Rival monitoring and exploration generate more intelligence.'},
+ {id:'architect',path:'scholar',name:'Civic Architect',req:2,desc:'Province projects progress faster and give stronger rewards.'},
+ {id:'patron',path:'magnate',name:'Patron Web',req:2,desc:'Exploration and quest rewards produce more denarii.'},
+ {id:'medic',path:'tribune',name:'Field Medicus',req:3,desc:'Recover health after adventures and reduce wound severity.'},
+ {id:'blackmail',path:'spymaster',name:'Blackmail Ledger',req:3,desc:'Expose and turn rival schemes with stronger leverage.'},
+ {id:'augur',path:'scholar',name:'Augur Engine',req:4,desc:'Exploration checks reveal rare outcomes and research momentum lasts longer.'},
+ {id:'icon',path:'orator',name:'People’s Icon',req:4,desc:'Campaign and popularity rewards are improved.'},
+ {id:'dynast',path:'magnate',name:'Dynastic Mandate',req:5,desc:'Quest completion grants renown, influence and faction cohesion.'}
+];
+const LOCATIONS=[
+ {id:'forum',name:'Forum Neonum',stat:'rhetoric',risk:2,reward:'popularity',text:'Crowds, petitions and hostile broadcasters fill the civic terraces.'},
+ {id:'subura',name:'Subura Undercity',stat:'strength',risk:4,reward:'money',text:'Old brick tunnels hold gangs, missing ledgers and hungry informants.'},
+ {id:'archives',name:'Imperial Archives',stat:'learning',risk:2,reward:'intel',text:'Quiet stacks hide machine-indexed prophecies and illegal contracts.'},
+ {id:'palace',name:'Palatine Arcology',stat:'charisma',risk:3,reward:'favor',text:'Courtiers trade succession rumors beneath mirrored gardens.'},
+ {id:'ostia',name:'Port of Ostia',stat:'strategy',risk:3,reward:'money',text:'Cargo syndicates, naval officers and foreign agents crowd the docks.'},
+ {id:'frontier',name:'Frontier Camp',stat:'strategy',risk:5,reward:'military',text:'Drone cohorts drill under bad weather and worse intelligence.'}
+];
+const QUEST_NAMES=[
+ ['Crisis Mandate','Resolve imperial crises before they boil over.','crisis',2],
+ ['The Rival Ledger','Neutralize or turn rival schemes.','rival',2],
+ ['Roads of Authority','Complete provincial projects.','project',2],
+ ['Subura Blood Debt','Defeat enemies in combat.','combat',3],
+ ['The People’s Circuit','Raise province support and popularity.','campaign',1],
+ ['Lex Aeterna','Pass laws and reduce corruption.','law',2]
+];
+const ITEMS=[
+ {id:'ledger',name:'Encrypted Patron Ledger',kind:'Intel',desc:'Use for +18 intelligence.',use:s=>{s.v48.intel=clamp((s.v48.intel||0)+18,0,100)}},
+ {id:'medkit',name:'Praetorian Medkit',kind:'Recovery',desc:'Use to restore 35 health and 1 energy.',use:s=>{s.hp=clamp(s.hp+35,0,s.maxHp);s.energy=clamp(s.energy+1,0,s.maxEnergy)}},
+ {id:'dossier',name:'Voting Dossier',kind:'Senate',desc:'Use for +12 influence.',use:s=>{s.influence+=12}},
+ {id:'relic',name:'Augur Shard',kind:'Relic',desc:'Use for research momentum and piety.',use:s=>{s.v48.researchMomentum=Math.max(s.v48.researchMomentum||0,6);s.piety+=4}}
+];
+function hasPerk(id){return !!S?.v5?.perks?.includes(id)}
+function perkPoints(){return Math.max(0,(S?.v5?.perkPoints||0))}
+function esc5(x){return typeof esc==='function'?esc(x):String(x)}
+function ensure5(){
+ if(typeof S==='undefined'||!S)return;
+ S.version='5.0';
+ if(!S.v48)S.v48={crises:[],rivals:[],directive:'balanced',resolved:0,failed:0,intel:10,cohesion:50,lastTick:S.day,history:[],provinceProjects:{},completedProjects:0,rivalsHandled:0,ambition:null,completedAmbitions:[],campaignIntel:null,marketShield:0,researchMomentum:0};
+ S.v5=S.v5||{archetype:null,perks:[],perkPoints:Math.max(1,(S.level||1)-1),renown:0,reputation:{Merciful:0,Ruthless:0,Reformer:0,Traditional:0},quests:[],completedQuests:[],explored:{},items:[],companionRoles:{},wounds:[],stance:'balanced',lastLevel:S.level||1,lastTick:S.day};
+ if(!Array.isArray(S.v5.perks))S.v5.perks=[];
+ if(!Array.isArray(S.v5.quests))S.v5.quests=[];
+ if(!Array.isArray(S.v5.items))S.v5.items=[];
+ if(!Array.isArray(S.v5.wounds))S.v5.wounds=[];
+ S.v5.reputation=S.v5.reputation||{Merciful:0,Ruthless:0,Reformer:0,Traditional:0};
+ S.v5.companionRoles=S.v5.companionRoles||{};
+ S.v5.explored=S.v5.explored||{};
+ S.v5.perkPoints=Math.max(0,Math.round(S.v5.perkPoints||0));
+ if(S.level>S.v5.lastLevel){S.v5.perkPoints+=S.level-S.v5.lastLevel;S.v5.lastLevel=S.level}
+ while(S.v5.quests.filter(q=>q.status==='offered').length<3)generateQuest();
+ clamp5();
+}
+function clamp5(){
+ if(!S?.v5)return;
+ S.v5.renown=Math.max(0,Math.round(S.v5.renown||0));
+ Object.keys(S.v5.reputation).forEach(k=>S.v5.reputation[k]=clamp(Math.round(S.v5.reputation[k]||0),-100,100));
+ S.v5.wounds=S.v5.wounds.filter(w=>w.days>0);
+ ['money','influence','favor','popularity','scandal','corruption','hp','energy'].forEach(k=>S[k]=Math.max(0,Math.round(S[k]||0)));
+ S.hp=clamp(S.hp,1,S.maxHp);S.energy=clamp(S.energy,0,S.maxEnergy);
+}
+function skillBonus(path){let b=0;if(S.v5.archetype===path)b+=2;b+=S.v5.perks.filter(id=>PERKS.find(p=>p.id===id)?.path===path).length;return b}
+function rpgCheck(stat,diff,path){
+ let base=roll(12)+(S[stat]||0)+skillBonus(path||stat);
+ if(hasPerk('augur')&&(stat==='learning'||path==='scholar'))base+=2;
+ if(hasPerk('silver')&&(stat==='rhetoric'||stat==='charisma'||path==='orator'))base+=2;
+ if(hasPerk('cipher')&&(stat==='learning'||path==='spymaster'))base+=2;
+ return base>=diff;
+}
+function pay5(c){
+ ensure5();let cost={...c};
+ if(hasPerk('patron')&&cost.money)cost.money=Math.max(0,Math.round(cost.money*.9));
+ let miss=[];if(S.energy<(cost.energy||0))miss.push(`${cost.energy} energy`);if(S.money<(cost.money||0))miss.push(`${cost.money} denarii`);if(S.influence<(cost.influence||0))miss.push(`${cost.influence} influence`);if((S.v48.intel||0)<(cost.intel||0))miss.push(`${cost.intel} intel`);
+ if(miss.length){toast(`Need ${miss.join(', ')}.`);return false}
+ S.energy-=cost.energy||0;S.money-=cost.money||0;S.influence-=cost.influence||0;S.v48.intel-=cost.intel||0;return true;
+}
+function cost5(c){let a=[];if(c.energy)a.push(`${c.energy} EN`);if(c.money)a.push(`${c.money} D`);if(c.influence)a.push(`${c.influence} INF`);if(c.intel)a.push(`${c.intel} INT`);return a.length?`<span class="v46-cost">${a.join(' • ')}</span>`:''}
+function rep(k,n){S.v5.reputation[k]=clamp((S.v5.reputation[k]||0)+n,-100,100)}
+function gainRenown(n){S.v5.renown+=n;let need=80+S.v5.perks.length*35;if(S.v5.renown>=need){S.v5.renown-=need;S.v5.perkPoints++;toast('Perk point gained.')}}
+function awardItem(){let it=ITEMS[roll(ITEMS.length)-1];S.v5.items.push({...it,uid:`${it.id}-${S.day}-${roll(9999)}`});toast(`Found: ${it.name}`)}
+function questMetric(q){if(q.type==='crisis')return S.v48.resolved-(q.base||0);if(q.type==='rival')return S.v48.rivalsHandled-(q.base||0);if(q.type==='project')return S.v48.completedProjects-(q.base||0);if(q.type==='combat')return S.enemiesDefeated-(q.base||0);if(q.type==='law')return S.billsPassed-(q.base||0);if(q.type==='campaign')return Math.floor((S.provinceSupport+S.popularity-(q.base||0))/20);return q.progress||0}
+function generateQuest(){
+ let q=QUEST_NAMES[roll(QUEST_NAMES.length)-1],id=`q-${S.day}-${roll(99999)}`,client=['House Varro','Temple Collegium','Praetorian Prefecture','Ostian Syndic','Provincial League','Curia Reform Bloc'][roll(6)-1];
+ S.v5.quests.push({id,title:q[0],desc:q[1],type:q[2],goal:q[3],client,status:'offered',base:0,reward:{money:180+roll(220),influence:7+roll(9),xp:32+roll(28),renown:10+roll(14)},expires:S.day+18+roll(16)});
+}
+function acceptQuest(id){
+ let q=S.v5.quests.find(x=>x.id===id);if(!q)return;if(S.v5.quests.filter(x=>x.status==='active').length>=3)return toast('Only three active quests can be managed at once.');
+ q.status='active';q.started=S.day;
+ if(q.type==='crisis')q.base=S.v48.resolved;if(q.type==='rival')q.base=S.v48.rivalsHandled;if(q.type==='project')q.base=S.v48.completedProjects;if(q.type==='combat')q.base=S.enemiesDefeated;if(q.type==='law')q.base=S.billsPassed;if(q.type==='campaign')q.base=S.provinceSupport+S.popularity;
+ addLog(`Quest accepted: ${q.title}.`);render();
+}
+function completeQuest(q){
+ q.status='complete';S.money+=q.reward.money+(hasPerk('patron')?70:0);S.influence+=q.reward.influence+(hasPerk('dynast')?5:0);gainXP(q.reward.xp);gainRenown(q.reward.renown+(hasPerk('dynast')?8:0));S.v5.completedQuests.push(q.id);rep('Reformer',q.type==='law'||q.type==='project'?3:1);addLog(`<span class="good-text">Quest complete:</span> ${q.title}.`);if(Math.random()<.32)awardItem();
+}
+function checkQuests(){
+ ensure5();S.v5.quests.forEach(q=>{if(q.status==='active'&&questMetric(q)>=q.goal)completeQuest(q);if(q.status==='offered'&&S.day>q.expires)q.status='expired'});
+ S.v5.quests=S.v5.quests.filter(q=>q.status!=='expired').slice(-12);while(S.v5.quests.filter(q=>q.status==='offered').length<3)generateQuest();
+}
+window.v5AcceptQuest=function(id){ensure5();acceptQuest(id)};
+window.v5AbandonQuest=function(id){ensure5();let q=S.v5.quests.find(x=>x.id===id);if(!q)return;q.status='abandoned';S.scandal+=1;addLog(`Quest abandoned: ${q.title}.`);render()};
+window.v5ChooseArchetype=function(id){
+ ensure5();if(S.v5.archetype)return toast('Your archetype is already set.');let a=ARCHETYPES[id];if(!a)return;
+ S.v5.archetype=id;Object.entries(a.stats).forEach(([k,v])=>S[k]=(S[k]||0)+v);addLog(`${S.name} commits to the path of ${a.name}.`);render();
+};
+window.v5BuyPerk=function(id){
+ ensure5();let p=PERKS.find(x=>x.id===id);if(!p||S.v5.perks.includes(id))return;if(perkPoints()<1)return toast('Need a perk point.');if((S.level||1)<p.req)return toast(`Requires level ${p.req}.`);
+ S.v5.perks.push(id);S.v5.perkPoints--;addLog(`Perk learned: ${p.name}.`);render();
+};
+window.v5UseItem=function(uid){
+ ensure5();let i=S.v5.items.findIndex(x=>x.uid===uid);if(i<0)return;let item=S.v5.items.splice(i,1)[0],def=ITEMS.find(x=>x.id===item.id);if(def)def.use(S);addLog(`Used ${item.name}.`);render();
+};
+window.v5Explore=function(id,approach){
+ ensure5();let loc=LOCATIONS.find(x=>x.id===id);if(!loc)return;if(!pay5({energy:2,money:approach==='bribe'?90:0}))return;
+ let stat={bold:'strength',diplomacy:'charisma',stealth:'learning',scholarship:'learning',command:'strategy',bribe:'charisma'}[approach]||loc.stat;
+ let path={bold:'tribune',diplomacy:'orator',stealth:'spymaster',scholarship:'scholar',command:'tribune',bribe:'magnate'}[approach]||'scholar';
+ let diff=10+loc.risk+S.v5.wounds.length,ok=rpgCheck(stat,diff,path),gain=ok?12+roll(14):4+roll(6);
+ S.v5.explored[id]=(S.v5.explored[id]||0)+1;gainRenown(ok?7:2);gainXP(ok?20:8);
+ if(loc.reward==='popularity')S.popularity+=ok?4:1;if(loc.reward==='money')S.money+=Math.round(gain*(hasPerk('patron')?1.35:1));if(loc.reward==='intel')S.v48.intel=clamp((S.v48.intel||0)+gain+(hasPerk('cipher')?5:0),0,100);if(loc.reward==='favor')S.favor+=ok?4:1;if(loc.reward==='military')S.world.military=clamp(S.world.military+(ok?2:1),0,100);
+ if(ok){rep(approach==='bold'?'Ruthless':approach==='diplomacy'?'Merciful':approach==='scholarship'?'Reformer':'Traditional',1);if(Math.random()<(hasPerk('augur')?.26:.16))awardItem();addLog(`<span class="good-text">${loc.name} explored successfully.</span> ${approach} approach yielded ${gain}.`)}
+ else{let wound={name:['Bruised ribs','Political liability','Exhaustion','Compromised cover'][roll(4)-1],days:hasPerk('medic')?1:2+roll(2)};S.v5.wounds.push(wound);S.hp=clamp(S.hp-(hasPerk('medic')?6:14+loc.risk*2),1,S.maxHp);S.scandal+=approach==='stealth'||approach==='bribe'?1:0;addLog(`<span class="bad-text">${loc.name} turns dangerous.</span> ${wound.name}.`)}
+ checkQuests();render();
+};
+window.v5AssignCompanion=function(name,role){
+ ensure5();if(!S.companions.find(c=>c.name===name))return toast('Recruit this companion first.');S.v5.companionRoles[name]=role;addLog(`${name} assigned as ${role}.`);render();
+};
+function companionTick(){
+ Object.entries(S.v5.companionRoles).forEach(([name,role])=>{let c=S.companions.find(x=>x.name===name);if(!c)return;c.loyalty=clamp((c.loyalty||45)+1,0,100);if(role==='Advisor'&&S.day%2===0)S.influence+=1;if(role==='Envoy'&&S.day%2===0)S.popularity+=1;if(role==='Spymaster')S.v48.intel=clamp((S.v48.intel||0)+1,0,100);if(role==='Bodyguard')S.hp=clamp(S.hp+1,1,S.maxHp)});
+}
+function tick5(){
+ ensure5();if(S.v5.lastTick===S.day)return;let days=clamp(S.day-S.v5.lastTick,1,14);S.v5.lastTick=S.day;
+ for(let i=0;i<days;i++){companionTick();S.v5.wounds.forEach(w=>w.days--);if(Math.random()<.14)generateQuest()}
+ checkQuests();clamp5();
+}
+function hero(title,sub){return `<div class="v5-hero"><div class="v5-kicker">Version 5 RPG</div><h2>${title}</h2><div class="small">${sub}</div></div>`}
+function skillsView(){
+ ensure5();let arch=ARCHETYPES[S.v5.archetype];
+ let paths=Object.entries(ARCHETYPES).map(([id,a])=>`<div class="v5-card v5-path ${S.v5.archetype===id?'active':''}"><h3>${a.name}</h3><div class="small">${a.tag}</div><p class="small">${a.desc}</p><button class="btn primary" ${S.v5.archetype?'disabled':''} onclick="v5ChooseArchetype('${id}')">Choose Path</button></div>`).join('');
+ let perks=PERKS.map(p=>{let owned=hasPerk(p.id),locked=(S.level||1)<p.req;return `<div class="v5-card ${owned?'v48-calm':locked?'locked':''}"><div class="v5-skill"><div class="v5-icon">${p.req}</div><div><h3>${p.name}</h3><div class="small">${ARCHETYPES[p.path]?.name||p.path} • Requires level ${p.req}</div><p class="small">${p.desc}</p><button class="btn ${owned?'good':'primary'}" ${owned||locked?'disabled':''} onclick="v5BuyPerk('${p.id}')">${owned?'Learned':locked?'Locked':'Spend Perk Point'}</button></div></div></div>`}).join('');
+ return `${hero('Skills & Identity','Choose a political RPG path, spend perk points, and shape how every system resolves checks.')}<div class="v48-ledger"><div><b>${arch?arch.name:'Unchosen'}</b><span class="small">Archetype</span></div><div><b>${perkPoints()}</b><span class="small">Perk points</span></div><div><b>${S.v5.perks.length}</b><span class="small">Perks</span></div><div><b>${S.v5.renown}</b><span class="small">Renown</span></div></div><h3>Archetypes</h3><div class="v5-paths">${paths}</div><h3>Perk Tree</h3><div class="v5-grid">${perks}</div><h3>Reputation</h3><div class="v5-grid three">${Object.entries(S.v5.reputation).map(([k,v])=>`<div class="v5-card"><div class="v5-row"><b>${k}</b><span>${v}</span></div><div class="v5-meter"><i style="width:${clamp(v+50,0,100)}%"></i></div></div>`).join('')}</div>`;
+}
+function adventuresView(){
+ ensure5();let active=S.v5.quests.filter(q=>q.status==='active'),offered=S.v5.quests.filter(q=>q.status==='offered'),items=S.v5.items;
+ let questHtml=(list,activeMode)=>list.map(q=>{let p=activeMode?Math.min(100,Math.round(questMetric(q)/q.goal*100)):0;return `<div class="v5-card v5-quest"><div class="v5-row"><h3>${q.title}</h3><span class="v5-pill gold">${q.client}</span></div><div class="small">${q.desc}</div>${activeMode?`<div class="v5-meter"><i style="width:${p}%"></i></div><div class="small">Progress ${questMetric(q)}/${q.goal}</div>`:`<div class="small">Expires day ${q.expires}</div>`}<div class="small">Reward ${q.reward.money} D • ${q.reward.influence} INF • ${q.reward.xp} XP</div><button class="btn ${activeMode?'':'primary'}" onclick="${activeMode?`v5AbandonQuest('${q.id}')`:`v5AcceptQuest('${q.id}')`}">${activeMode?'Abandon':'Accept Quest'}</button></div>`}).join('');
+ let locs=LOCATIONS.map(l=>`<div class="v5-card"><h3>${l.name}</h3><p class="small">${l.text}</p><div class="v5-row small"><span>Check ${l.stat}</span><span>Risk ${l.risk}</span><span>Visits ${S.v5.explored[l.id]||0}</span></div><div class="v5-actions"><button class="btn" onclick="v5Explore('${l.id}','diplomacy')">Diplomacy ${cost5({energy:2})}</button><button class="btn blue" onclick="v5Explore('${l.id}','stealth')">Stealth ${cost5({energy:2})}</button><button class="btn good" onclick="v5Explore('${l.id}','command')">Command ${cost5({energy:2})}</button><button class="btn purple" onclick="v5Explore('${l.id}','scholarship')">Scholarship ${cost5({energy:2})}</button><button class="btn" onclick="v5Explore('${l.id}','bribe')">Bribe ${cost5({energy:2,money:90})}</button></div></div>`).join('');
+ return `${hero('Adventures & Questing','Take contracts, explore districts, find items, suffer wounds, and gain renown beyond the Senate ledger.')}<div class="v48-ledger"><div><b>${active.length}/3</b><span class="small">Active quests</span></div><div><b>${S.v5.completedQuests.length}</b><span class="small">Completed</span></div><div><b>${S.v5.items.length}</b><span class="small">Items</span></div><div><b>${S.v5.wounds.length}</b><span class="small">Wounds</span></div></div><h3>Active Quests</h3><div class="v5-grid">${questHtml(active,true)||'<div class="v5-card"><div class="small">No active quests. Accept contracts below.</div></div>'}</div><h3>Available Contracts</h3><div class="v5-grid">${questHtml(offered,false)}</div><h3>Explore the Imperium</h3><div class="v5-grid">${locs}</div><h3>Inventory</h3><div class="v5-inventory">${items.map(i=>`<div class="v5-item"><b>${i.name}</b><div class="small">${i.kind} • ${i.desc}</div><button class="btn" onclick="v5UseItem('${i.uid}')">Use</button></div>`).join('')||'<div class="small">No usable items yet.</div>'}</div><h3>Wounds</h3>${S.v5.wounds.map(w=>`<span class="v5-pill bad">${w.name}: ${w.days}d</span>`).join('')||'<span class="v5-pill good">No wounds</span>'}`;
+}
+function characterV5(){
+ ensure5();let arch=ARCHETYPES[S.v5.archetype];return `${hero('Character Sheet','The ruler now has RPG identity, perks, wounds, renown and a persistent inventory.')}<div class="v5-portrait-wrap"><div class="v5-paper"><canvas id="v5Portrait" width="320" height="390"></canvas><b>${esc5(S.name)}</b><div class="small">${arch?arch.name:'No archetype'} • Level ${S.level}</div></div><div><div class="v48-ledger"><div><b>${S.hp}/${S.maxHp}</b><span class="small">Health</span></div><div><b>${S.energy}/${S.maxEnergy}</b><span class="small">Energy</span></div><div><b>${S.v5.renown}</b><span class="small">Renown</span></div><div><b>${S.v5.perkPoints}</b><span class="small">Perk points</span></div></div><h3>RPG State</h3>${['strength','endurance','charisma','rhetoric','strategy','learning'].map(k=>`<div class="v5-row"><span>${k}</span><b>${S[k]}</b></div>`).join('')}<div style="margin-top:10px"><button class="btn primary" onclick="tab('Skills')">Open Skills</button><button class="btn blue" onclick="tab('Adventures')">Open Adventures</button></div></div></div>`;
+}
+function drawV5Portrait(){
+ let cv=document.getElementById('v5Portrait');if(!cv)return;let x=cv.getContext('2d'),w=cv.width,h=cv.height,arch=S.v5?.archetype||'orator',col={orator:'#d8b45e',tribune:'#c6534c',spymaster:'#6fc7d4',scholar:'#9a83e6',magnate:'#72c889'}[arch]||'#d8b45e';
+ x.clearRect(0,0,w,h);let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#18282c');g.addColorStop(1,'#080909');x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle=col+'33';x.fillRect(0,h*.62,w,h*.38);x.fillStyle='#d9b08a';x.beginPath();x.arc(w*.5,h*.25,42,0,7);x.fill();x.fillStyle='#121113';x.beginPath();x.arc(w*.5,h*.20,45,Math.PI,0);x.fill();x.fillStyle=col;x.beginPath();x.moveTo(w*.25,h*.95);x.lineTo(w*.36,h*.42);x.lineTo(w*.64,h*.42);x.lineTo(w*.75,h*.95);x.fill();x.strokeStyle='#f2d48d';x.lineWidth=4;x.stroke();x.fillStyle='#111';x.fillRect(w*.43,h*.25,5,5);x.fillRect(w*.56,h*.25,5,5);x.strokeStyle='#6c3b34';x.beginPath();x.moveTo(w*.43,h*.33);x.quadraticCurveTo(w*.5,h*.37,w*.57,h*.33);x.stroke();x.fillStyle='#f0d28c';x.font='18px Georgia';x.fillText(ARCHETYPES[arch]?.name||'Senator',26,h-28);
+}
+function peopleAugment(){
+ ensure5();let view=document.getElementById('view');if(!view||view.dataset.v5People||currentTab!=='People')return;view.dataset.v5People='1';
+ let roles=['Advisor','Bodyguard','Envoy','Spymaster'];let html=`<div class="v5-hero"><div class="v5-kicker">Party Management</div><h2>Companion Roles</h2><div class="small">Assigned companions now provide daily RPG effects and loyalty growth.</div></div><div class="v5-grid">${(S.companions||[]).map(c=>`<div class="v5-card"><h3>${c.name}</h3><div class="small">${c.role} • Loyalty ${c.loyalty??45}</div><div class="v5-actions">${roles.map(r=>`<button class="btn ${S.v5.companionRoles[c.name]===r?'primary':''}" onclick="v5AssignCompanion('${esc5(c.name).replace(/'/g,'&#39;')}','${r}')">${r}</button>`).join('')}</div></div>`).join('')||'<div class="v5-card"><div class="small">Recruit companions to assign party roles.</div></div>'}</div>`;
+ view.insertAdjacentHTML('beforeend',html);
+}
+function capitalAugment(){
+ ensure5();let view=document.getElementById('view');if(!view||view.dataset.v5Cap||currentTab!=='Capital')return;view.dataset.v5Cap='1';
+ view.insertAdjacentHTML('beforeend',`<div class="v5-hero"><div class="v5-kicker">Version 5 RPG Hub</div><h2>Dynasty Roleplay</h2><div class="small">The empire now tracks a personal RPG path, quests, exploration, wounds, items, party roles and perks.</div><div class="v5-actions two"><button class="btn primary" onclick="tab('Adventures')">Adventures</button><button class="btn blue" onclick="tab('Skills')">Skills</button></div></div>`);
+}
+function renderTabs5(){
+ ensure5();let hasCouncil=typeof window.ensure4==='function'||!!S.v4;
+ let html=V5_TABS.filter(t=>hasCouncil||t[0]!=='Imperial Council').map(([key,ico,label])=>`<button type="button" class="v43-tab ${currentTab===key?'active':''}" data-tab="${key}" onclick="tab('${key}')"><span class="ico">${ico}</span><span class="lbl">${label}</span>${currentTab===key?'<span class="dot"></span>':''}</button>`).join('');
+ let tabs=$('tabs');tabs.className='tabs v43-dock v44-dock';tabs.innerHTML=html;
+}
+function modalCombat5(){
+ let c=S.combat;if(!c)return;let traits=c.v5?.traits?.join(' • ')||'Adaptive enemy';
+ modal(`<h2>Tactical Conflict</h2><div class="combat-grid"><div><canvas id="v45CombatPlayer" class="v45-portrait" width="220" height="250"></canvas><b>${esc5(S.name)}</b><div>HP ${S.hp}/${S.maxHp}</div><div class="small">${ARCHETYPES[S.v5.archetype]?.name||'Unfocused'} • ${S.v5.wounds.length} wounds</div></div><div><div class="portrait">⚔️</div><b>${c.name}</b><div>HP ${c.hp}/${c.maxHp}</div><div class="small">${traits}</div></div></div><div class="choices" style="margin-top:12px"><button class="choice" onclick="v5Combat('strike')">Measured Strike</button><button class="choice" onclick="v5Combat('speech')">Rallying Rebuke</button><button class="choice" onclick="v5Combat('flank')">Flank</button><button class="choice" onclick="v5Combat('exploit')">Exploit Weakness</button><button class="choice" onclick="v5Combat('guard')">Guard</button><button class="choice" onclick="v5Combat('withdraw')">Withdraw</button></div>`);
+ requestAnimationFrame(()=>{if(typeof drawPlayer==='function')drawPlayer(document.getElementById('v45CombatPlayer'))});
+}
+window.v5Combat=function(a){
+ ensure5();let c=S.combat;if(!c)return;let dmg=0,guard=0;
+ if(a==='withdraw'){S.hp=clamp(S.hp-6,1,S.maxHp);S.scandal+=1;S.combat=null;closeModal();addLog('You withdraw from the tactical fight.');render();return}
+ if(a==='strike')dmg=roll(8)+S.strength*2+skillBonus('tribune')*2+(hasPerk('tribune')?5:0);
+ if(a==='speech')dmg=roll(6)+S.rhetoric*2+skillBonus('orator')*2+(hasPerk('silver')?4:0);
+ if(a==='flank'){let ok=rpgCheck('strategy',13,'tribune');dmg=ok?18+S.strategy*2:6;guard=ok?4:0}
+ if(a==='exploit'){let ok=rpgCheck('learning',13,'spymaster');dmg=ok?20+S.learning*2:4;S.v48.intel=clamp((S.v48.intel||0)+(ok?4:0),0,100)}
+ if(a==='guard'){c.guard=10+S.endurance+skillBonus('tribune')*2;modalCombat5();return}
+ c.hp-=dmg;if(c.hp<=0){S.enemiesDefeated++;S.money+=90+roll(130);S.influence+=4;gainXP(45);gainRenown(9);rep('Ruthless',1);if(Math.random()<.22)awardItem();S.combat=null;closeModal();checkQuests();addLog(`<span class="good-text">${c.name} is defeated in tactical combat.</span>`);render();return}
+ let hit=Math.max(1,c.dmg+roll(8)-(c.guard||0)-guard-S.endurance-(hasPerk('tribune')?4:0));c.guard=0;S.hp-=hit;
+ if(S.hp<=0){S.hp=Math.ceil(S.maxHp*.35);S.v5.wounds.push({name:'Severe battle wound',days:hasPerk('medic')?2:4});S.money=Math.max(0,S.money-120);S.combat=null;closeModal();addLog('You survive the fight, but the wound changes the week ahead.');endDay();return}
+ modalCombat5();
+};
+function startCombat5(name,hp,dmg){S.combat={name,hp,maxHp:hp,dmg,guard:0,v5:{traits:[['Armored','Zealous','Cunning','Veteran'][roll(4)-1]]}};modalCombat5()}
+const oldTabs5=window.renderTabs;window.renderTabs=renderTabs5;try{renderTabs=renderTabs5}catch(e){}
+const oldView5=window.renderView;window.renderView=function(){ensure5();if(currentTab==='Adventures'){$('view').innerHTML=adventuresView();return}if(currentTab==='Skills'){$('view').innerHTML=skillsView();return}if(currentTab==='Character'){$('view').innerHTML=characterV5();requestAnimationFrame(drawV5Portrait);return}oldView5();requestAnimationFrame(()=>{capitalAugment();peopleAugment()})};try{renderView=window.renderView}catch(e){}
+const oldRender5=window.render;window.render=function(){ensure5();let out=oldRender5();ensure5();checkQuests();requestAnimationFrame(()=>{capitalAugment();peopleAugment();if(currentTab==='Character')drawV5Portrait()});return out};try{render=window.render}catch(e){}
+const oldEnd5=window.endDay;window.endDay=function(){ensure5();let before=S.day;oldEnd5();ensure5();if(S.day!==before)tick5();autoSave();render()};try{endDay=window.endDay}catch(e){}
+const oldGain5=window.gainXP;window.gainXP=function(n){ensure5();oldGain5(n);ensure5()};try{gainXP=window.gainXP}catch(e){}
+const oldStartCombat5=window.startCombat;window.startCombat=startCombat5;try{startCombat=startCombat5}catch(e){}
+const oldCombatModal5=window.combatModal;window.combatModal=modalCombat5;try{combatModal=modalCombat5}catch(e){}
+const oldCombat5=window.combat;window.combat=function(a){if(['strike','speech','flank','exploit','guard','withdraw'].includes(a))return v5Combat(a);return oldCombat5(a)};try{combat=window.combat}catch(e){}
+const oldStart5=window.start;window.start=function(){oldStart5();ensure5();render()};try{start=window.start}catch(e){}
+const oldLoad5=window.loadGame;window.loadGame=function(){oldLoad5();setTimeout(()=>{ensure5();render();toast('Save migrated to Version 5.')},0)};try{loadGame=window.loadGame}catch(e){}
+function boot(){if(S){ensure5();render()}let title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul'}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
 })();
 </script>
 </body></html>

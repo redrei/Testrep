@@ -1,7 +1,7 @@
 {
-  "id": "./?v=4.0",
-  "name": "Imperium Aeternum IV: Interactive Imperium — Living Imperium",
-  "short_name": "Imperium IV",
+  "id": "./?v=5.0.1",
+  "name": "Imperium Aeternum V: RPG Imperium",
+  "short_name": "Imperium V",
   "description": "A code-rendered political strategy RPG in an eternal modern Roman Empire.",
   "start_url": "./",
   "scope": "./",
@@ -39,5 +39,5 @@
       "purpose": "maskable"
     }
   ],
-  "version": "3.0.0"
+  "version": "5.0.1"
 }
