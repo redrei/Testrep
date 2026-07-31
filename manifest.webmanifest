@@ -1,5 +1,5 @@
 {
-  "id": "./?v=5.0.1",
+  "id": "./?v=5.0.3",
   "name": "Imperium Aeternum V: RPG Imperium",
   "short_name": "Imperium V",
   "description": "A code-rendered political strategy RPG in an eternal modern Roman Empire.",
@@ -39,5 +39,5 @@
       "purpose": "maskable"
     }
   ],
-  "version": "5.0.1"
+  "version": "5.0.3"
 }

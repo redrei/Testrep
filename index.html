@@ -938,7 +938,7 @@ function clampAll(){
 }
 function ensureRpg(){
  if(!S)return;
- S.version='5.0';
+ S.version='5.0.3';
  S.world=S.world||{treasury:500,economy:50,stability:50,military:45};
  S.factions=S.factions||{Traditionalists:35,Imperialists:30,Merchants:35,Populists:30,Technocrats:30,Provincials:25};
  S.provinces=S.provinces||{};provinces.forEach(n=>{S.provinces[n]=S.provinces[n]||{loyalty:45,economy:45,unrest:12,military:35,governor:'Acting Prefect'}});
@@ -1056,6 +1056,15 @@ const COST_RULES=[
  [/train\('learning'\)|Archives|Study/i,{energy:2,money:80}],
  [/train\('strength'\)|Praetorium|Train/i,{energy:2,money:80}],
  [/salon\(\)|Salon/i,{energy:2,money:180}],
+ [/v48CrisisAction\('[^']+','relief'\)/i,{energy:1,money:220}],
+ [/v48CrisisAction\('[^']+','negotiate'\)/i,{energy:2,influence:6}],
+ [/v48CrisisAction\('[^']+','deploy'\)/i,{energy:1,favor:4}],
+ [/v48CrisisAction\('[^']+','investigate'\)/i,{energy:1,intel:8}],
+ [/v48RivalAction\([^,]+,'monitor'\)/i,{energy:1}],
+ [/v48RivalAction\([^,]+,'deal'\)/i,{money:160,influence:4}],
+ [/v48RivalAction\([^,]+,'expose'\)/i,{energy:2,intel:12}],
+ [/v48RivalAction\([^,]+,'turn'\)/i,{influence:12}],
+ [/v48Scan\(\)/i,{energy:1}],
  [/investigate\(\)|Inquiry|Investigate/i,{energy:2}],
  [/fight\(\)|Subura|Patrol Streets|Patrol the Subura/i,{energy:2}],
  [/palace\(\)|Palace|Request Audience/i,{energy:2}],
@@ -1086,7 +1095,7 @@ const COST_RULES=[
  [/rerollMissions\(\)|New Docket/i,{money:120}]
 ];
 function state(){return typeof S!=='undefined'&&S?S:null}
-function costText(c){let bits=[];if(c.energy)bits.push(`${c.energy} EN`);if(c.money)bits.push(`${c.money} D`);if(c.influence)bits.push(`${c.influence} INF`);return bits.join(' • ')}
+function costText(c){let bits=[];if(c.energy)bits.push(`${c.energy} EN`);if(c.money)bits.push(`${c.money} D`);if(c.influence)bits.push(`${c.influence} INF`);if(c.favor)bits.push(`${c.favor} FAV`);if(c.intel)bits.push(`${c.intel} INT`);return bits.join(' • ')}
 function resolveDynamic(btn,code,cost){
  if(cost.dynamic==='item'){let m=code.match(/buyItem\('([^']+)'\)/),it=m&&typeof itemById==='function'?itemById(m[1]):null;return it?{money:it.cost}:{}}
  if(cost.dynamic==='business'){let name=(code.match(/buyBusiness\('([^']+)'\)/)||[])[1]?.replace(/\\'/g,"'"),b=typeof businesses!=='undefined'&&businesses.find(x=>x.name===name);return b?{money:b.cost}:{}}
@@ -1099,8 +1108,8 @@ function inferCost(btn){
  let rule=COST_RULES.find(([re])=>re.test(hay));if(!rule)return null;
  return resolveDynamic(btn,code,rule[1]);
 }
-function afford(c){let s=state();if(!s||!c)return true;return (s.energy??0)>=(c.energy||0)&&(s.money??0)>=(c.money||0)&&(s.influence??0)>=(c.influence||0)}
-function blockReason(c){let s=state(),miss=[];if(!s||!c)return '';if((s.energy??0)<(c.energy||0))miss.push(`${c.energy} energy`);if((s.money??0)<(c.money||0))miss.push(`${c.money} denarii`);if((s.influence??0)<(c.influence||0))miss.push(`${c.influence} influence`);return miss.length?`Requires ${miss.join(', ')}.`:''}
+function afford(c){let s=state();if(!s||!c)return true;return (s.energy??0)>=(c.energy||0)&&(s.money??0)>=(c.money||0)&&(s.influence??0)>=(c.influence||0)&&(s.favor??0)>=(c.favor||0)&&((s.v48?.intel??0)>=(c.intel||0))}
+function blockReason(c){let s=state(),miss=[];if(!s||!c)return '';if((s.energy??0)<(c.energy||0))miss.push(`${c.energy} energy`);if((s.money??0)<(c.money||0))miss.push(`${c.money} denarii`);if((s.influence??0)<(c.influence||0))miss.push(`${c.influence} influence`);if((s.favor??0)<(c.favor||0))miss.push(`${c.favor} imperial favor`);if((s.v48?.intel??0)<(c.intel||0))miss.push(`${c.intel} intelligence`);return miss.length?`Requires ${miss.join(', ')}.`:''}
 function decorateCosts(root=document){
  if(!state())return;
  root.querySelectorAll('button').forEach(btn=>{
@@ -1272,7 +1281,7 @@ function frame(now){if(!G.ready)return;draw(now||performance.now());requestAnima
 function updateScene(name){G.scene=name||safeScene();if(G.ready){seed();pulse(.5,.58)}}
 function enhance(){
  const on=desktop();document.body.classList.toggle('desktop-nextgen',on);if(on)init();
- if(typeof S!=='undefined'&&S)S.version='5.0';
+ if(typeof S!=='undefined'&&S)S.version='5.0.3';
  const sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul';
  const title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';
  document.querySelectorAll('.v44-map,.v44-chamber,.v44-war-map,.v45-portrait').forEach(el=>{el.dataset.v47='1'});
@@ -1343,7 +1352,7 @@ function pct(n){return clamp(Math.round(n),0,100)}
 function choose(a){return a[Math.floor(Math.random()*a.length)]}
 function ensure48(){
  if(typeof S==='undefined'||!S)return;
- S.version='5.0';
+ S.version='5.0.3';
  S.v48=S.v48||{crises:[],rivals:[],directive:'balanced',resolved:0,failed:0,intel:10,cohesion:50,lastTick:S.day,history:[],provinceProjects:{},completedProjects:0,rivalsHandled:0,ambition:null,completedAmbitions:[],campaignIntel:null,marketShield:0,researchMomentum:0};
  if(!Array.isArray(S.v48.crises))S.v48.crises=[];
  if(!Array.isArray(S.v48.rivals))S.v48.rivals=[];
@@ -1519,10 +1528,10 @@ function augmentView(){
  let view=document.getElementById('view');if(!view||view.dataset.v48)return;view.dataset.v48='1';
  if(currentTab==='Capital')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Strategic Pressure</h3><div class="v48-ledger"><div><b>${S.v48.crises.length}</b><span class="small">Crises</span></div><div><b>${S.v48.rivals.filter(r=>r.status==='active').length}</b><span class="small">Active rivals</span></div><div><b>${S.v48.directive}</b><span class="small">Directive</span></div><div><b>${S.v48.intel}</b><span class="small">Intel</span></div></div><div class="v48-actions two"><button class="btn primary" onclick="tab('Situation')">Open Situation</button><button class="btn blue" onclick="tab('Intrigue')">Open Intrigue</button></div></div>`);
  if(currentTab==='Provinces')view.insertAdjacentHTML('beforeend',provinceProjectHtml());
- if(currentTab==='Senate')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Procedural Senate Maneuvers</h3><div class="small">Amendments now modify the living vote environment instead of being simple flat actions.</div><div class="v48-actions"><button class="btn good" onclick="v48SenateMove('popular')">Popular Amendment ${cost({energy:1,money:130})}</button><button class="btn blue" onclick="v48SenateMove('technical')">Technical Review ${cost({energy:1,intel:6})}</button><button class="btn purple" onclick="v48SenateMove('concession')">Backroom Concession ${cost({influence:8})}</button></div></div>`);
- if(currentTab==='Campaign')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Dynamic Campaign Operations</h3><div class="small">${S.v48.campaignIntel?`Last poll: ${S.v48.campaignIntel.score}% on day ${S.v48.campaignIntel.day}.`:'No recent polling model.'}</div><div class="v48-actions"><button class="btn" onclick="v48CampaignMove('poll')">Commission Poll ${cost({energy:1,money:90})}</button><button class="btn good" onclick="v48CampaignMove('district')">District Ground Game ${cost({energy:2,money:170})}</button><button class="btn blue" onclick="v48CampaignMove('rapid')">Rapid Response ${cost({energy:1,intel:10})}</button></div></div>`);
- if(currentTab==='Estate')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Portfolio Risk Desk</h3><div class="small">Market shield: ${S.v48.marketShield} days. Business growth now has governance tradeoffs.</div><div class="v48-actions"><button class="btn" onclick="v48Portfolio('audit')">Audit Holdings ${cost({energy:1,money:120})}</button><button class="btn blue" onclick="v48Portfolio('hedge')">Hedge Markets ${cost({money:260})}</button><button class="btn good" onclick="v48Portfolio('expand')">Expand Charter ${cost({money:900,influence:10})}</button></div></div>`);
- if(currentTab==='Research')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Breakthrough Lab</h3><div class="small">Research momentum: ${S.v48.researchMomentum} days. Momentum accelerates provincial projects.</div><div class="v48-actions"><button class="btn purple" onclick="v48Breakthrough('prototype')">Prototype Program ${cost({energy:2,money:260})}</button><button class="btn" onclick="v48Breakthrough('publish')">Publish Findings ${cost({energy:1})}</button><button class="btn blue" onclick="v48Breakthrough('doctrine')">Military Doctrine ${cost({energy:1,money:180})}</button></div></div>`);
+ if(currentTab==='Senate')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Procedural Senate Maneuvers</h3><div class="small">Amendments now modify the living vote environment instead of being simple flat actions.</div><div class="v48-actions"><button class="btn good" onclick="v48SenateMove('popular')">Popular Amendment ${cost({energy:1,money:160})}</button><button class="btn blue" onclick="v48SenateMove('technical')">Technical Review ${cost({energy:1,intel:8})}</button><button class="btn purple" onclick="v48SenateMove('concession')">Backroom Concession ${cost({influence:10})}</button></div></div>`);
+ if(currentTab==='Campaign')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Dynamic Campaign Operations</h3><div class="small">${S.v48.campaignIntel?`Last poll: ${S.v48.campaignIntel.score}% on day ${S.v48.campaignIntel.day}.`:'No recent polling model.'}</div><div class="v48-actions"><button class="btn" onclick="v48CampaignMove('poll')">Commission Poll ${cost({energy:1,money:90})}</button><button class="btn good" onclick="v48CampaignMove('district')">District Ground Game ${cost({energy:2,money:220})}</button><button class="btn blue" onclick="v48CampaignMove('rapid')">Rapid Response ${cost({energy:1,intel:10})}</button></div></div>`);
+ if(currentTab==='Estate')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Portfolio Risk Desk</h3><div class="small">Market shield: ${S.v48.marketShield} days. Business growth now has governance tradeoffs.</div><div class="v48-actions"><button class="btn" onclick="v48Portfolio('audit')">Audit Holdings ${cost({energy:1,money:120})}</button><button class="btn blue" onclick="v48Portfolio('hedge')">Hedge Markets ${cost({money:340})}</button><button class="btn good" onclick="v48Portfolio('expand')">Expand Charter ${cost({money:1200,influence:14})}</button></div></div>`);
+ if(currentTab==='Research')view.insertAdjacentHTML('beforeend',`<div class="v48-augment"><h3>Breakthrough Lab</h3><div class="small">Research momentum: ${S.v48.researchMomentum} days. Momentum accelerates provincial projects.</div><div class="v48-actions"><button class="btn purple" onclick="v48Breakthrough('prototype')">Prototype Program ${cost({energy:2,money:320})}</button><button class="btn" onclick="v48Breakthrough('publish')">Publish Findings ${cost({energy:1})}</button><button class="btn blue" onclick="v48Breakthrough('doctrine')">Military Doctrine ${cost({energy:1,money:220})}</button></div></div>`);
 }
 function renderTabs48(){
  ensure48();let hasCouncil=typeof window.ensure4==='function'||!!S.v4;
@@ -1608,7 +1617,7 @@ function perkPoints(){return Math.max(0,(S?.v5?.perkPoints||0))}
 function esc5(x){return typeof esc==='function'?esc(x):String(x)}
 function ensure5(){
  if(typeof S==='undefined'||!S)return;
- S.version='5.0';
+ S.version='5.0.3';
  if(!S.v48)S.v48={crises:[],rivals:[],directive:'balanced',resolved:0,failed:0,intel:10,cohesion:50,lastTick:S.day,history:[],provinceProjects:{},completedProjects:0,rivalsHandled:0,ambition:null,completedAmbitions:[],campaignIntel:null,marketShield:0,researchMomentum:0};
  S.v5=S.v5||{archetype:null,perks:[],perkPoints:Math.max(1,(S.level||1)-1),renown:0,reputation:{Merciful:0,Ruthless:0,Reformer:0,Traditional:0},quests:[],completedQuests:[],explored:{},items:[],companionRoles:{},wounds:[],stance:'balanced',lastLevel:S.level||1,lastTick:S.day};
  if(!Array.isArray(S.v5.perks))S.v5.perks=[];
@@ -1767,6 +1776,69 @@ const oldCombat5=window.combat;window.combat=function(a){if(['strike','speech','
 const oldStart5=window.start;window.start=function(){oldStart5();ensure5();render()};try{start=window.start}catch(e){}
 const oldLoad5=window.loadGame;window.loadGame=function(){oldLoad5();setTimeout(()=>{ensure5();render();toast('Save migrated to Version 5.')},0)};try{loadGame=window.loadGame}catch(e){}
 function boot(){if(S){ensure5();render()}let title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5 • RPG Overhaul'}
+addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
+})();
+</script>
+<style id="v502-bugfix-style">
+/* Version 5.0.3 bugfix and recovery polish */
+.v502-legislation{margin-top:14px;border:1px solid #665f4d;border-radius:14px;background:linear-gradient(180deg,#151715,#0c0e0d);padding:12px}
+.v502-law-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}.v502-law{border:1px solid #4e5f56;border-radius:12px;background:#090f0e;padding:10px}.v502-law.critical{border-color:#d1ad62;box-shadow:0 0 22px #d1ad6220}.v502-law.done{opacity:.55}
+.v502-law h3{margin-top:0}.v502-note{border-left:3px solid #79e7f5;padding:8px 10px;background:#0a1517;margin:10px 0;border-radius:10px}.v502-status{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.v502-status span{border:1px solid #4f625a;border-radius:999px;padding:3px 7px;font:11px system-ui,sans-serif;color:#cbd8d0}
+</style>
+<script id="v502-bugfixes">
+(()=>{
+'use strict';
+function fixTitle(){document.title='Imperium Aeternum V — RPG Imperium';let title=document.querySelector('.title');if(title)title.textContent='IMPERIUM AETERNUM V';let sub=document.querySelector('.subtitle');if(sub)sub.textContent='Version 5.0.3 • Bug Fixes & Balance'}
+function uniq(a){return Array.from(new Set(Array.isArray(a)?a:[]))}
+function num(v,d=0){v=Number(v);return Number.isFinite(v)?v:d}
+function normalize502(){
+ if(typeof S==='undefined'||!S)return;
+ S.version='5.0.3';
+ S.name=String(S.name||'Marcus Valerius');S.flags=S.flags||{};
+ S.world=S.world||{treasury:500,economy:50,stability:50,military:45};
+ ['treasury','economy','stability','military'].forEach(k=>S.world[k]=Math.max(0,Math.round(num(S.world[k]))));
+ ['economy','stability','military'].forEach(k=>S.world[k]=clamp(S.world[k],0,100));
+ S.factions=S.factions||{};Object.keys(factionData).forEach(k=>S.factions[k]=clamp(Math.round(num(S.factions[k],30)),0,100));
+ S.passed=uniq(S.passed);S.research=uniq(S.research);S.visited=uniq(S.visited);S.inventory=uniq(S.inventory);
+ S.businesses=Array.isArray(S.businesses)?S.businesses:[];S.companions=Array.isArray(S.companions)?S.companions:[];
+ if(!Array.isArray(S.log))S.log=[];if(!Array.isArray(S.sideQuests))S.sideQuests=[];
+ if(!Array.isArray(S.senators)||!S.senators.length)S.senators=typeof makeSenators==='function'?makeSenators():[];
+ S.day=Math.max(1,Math.round(num(S.day,1)));S.year=Math.max(1,Math.round(num(S.year,2779)));
+ S.office=clamp(Math.round(num(S.office)),0,offices.length-1);S.electionDay=Math.max(S.day+1,Math.round(num(S.electionDay,S.day+40)));
+ S.billsPassed=Math.max(S.passed.length,Math.round(num(S.billsPassed)));S.enemiesDefeated=Math.max(0,Math.round(num(S.enemiesDefeated)));S.electionsWon=Math.max(0,Math.round(num(S.electionsWon)));S.businessSlots=Math.max(1,Math.round(num(S.businessSlots,2)));
+ S.maxHp=Math.max(1,Math.round(num(S.maxHp,100)));S.maxEnergy=Math.max(1,Math.round(num(S.maxEnergy,10)));S.xpNext=Math.max(1,Math.round(num(S.xpNext,100)));
+ S.storyIndex=clamp(Math.round(S.storyIndex||0),0,story.length);
+ if(!S.provinces)S.provinces={};provinces.forEach(n=>{S.provinces[n]=S.provinces[n]||{loyalty:45,economy:45,unrest:12,military:35,governor:'Acting Prefect'};['loyalty','economy','unrest','military'].forEach(k=>S.provinces[n][k]=clamp(Math.round(Number(S.provinces[n][k])||0),0,100))});
+ if(!S.v48&&typeof window.v48Scan==='function'){S.v48={crises:[],rivals:[],directive:'balanced',resolved:0,failed:0,intel:10,cohesion:50,lastTick:S.day,history:[],provinceProjects:{},completedProjects:0,rivalsHandled:0,ambition:null,completedAmbitions:[],campaignIntel:null,marketShield:0,researchMomentum:0}}
+ if(S.v48){S.v48.completedAmbitions=uniq(S.v48.completedAmbitions);S.v48.crises=Array.isArray(S.v48.crises)?S.v48.crises:[];S.v48.rivals=Array.isArray(S.v48.rivals)?S.v48.rivals:[];S.v48.history=Array.isArray(S.v48.history)?S.v48.history:[];S.v48.provinceProjects=S.v48.provinceProjects||{};['resolved','failed','completedProjects','rivalsHandled','marketShield','researchMomentum'].forEach(k=>S.v48[k]=Math.max(0,Math.round(num(S.v48[k]))));S.v48.intel=clamp(Math.round(num(S.v48.intel)),0,100);S.v48.cohesion=clamp(Math.round(num(S.v48.cohesion,50)),0,100);S.v48.lastTick=Math.max(1,Math.round(num(S.v48.lastTick,S.day)));provinces.forEach(n=>{if(!Object.prototype.hasOwnProperty.call(S.v48.provinceProjects,n))S.v48.provinceProjects[n]=null})}
+ if(S.v5){S.v5.perks=uniq(S.v5.perks);S.v5.completedQuests=uniq(S.v5.completedQuests);S.v5.items=Array.isArray(S.v5.items)?S.v5.items:[];S.v5.quests=Array.isArray(S.v5.quests)?S.v5.quests:[];S.v5.wounds=Array.isArray(S.v5.wounds)?S.v5.wounds:[];S.v5.reputation=S.v5.reputation||{Merciful:0,Ruthless:0,Reformer:0,Traditional:0};Object.keys(S.v5.reputation).forEach(k=>S.v5.reputation[k]=clamp(Math.round(num(S.v5.reputation[k])),-100,100));S.v5.perkPoints=Math.max(0,Math.round(num(S.v5.perkPoints)));S.v5.renown=Math.max(0,Math.round(num(S.v5.renown)));S.v5.companionRoles=S.v5.companionRoles||{};S.v5.explored=S.v5.explored||{};S.v5.quests.forEach(q=>{if(!['offered','active','complete','abandoned'].includes(q.status))q.status='offered';if(!q.reward)q.reward={money:200,influence:8,xp:35,renown:10}});S.v5.quests=S.v5.quests.filter(q=>q&&q.id).slice(-14);S.v5.wounds=S.v5.wounds.filter(w=>w&&Number(w.days)>0)}
+ ['money','influence','favor','popularity','scandal','corruption','provinceSupport','hp','energy','xp','level'].forEach(k=>S[k]=Math.max(0,Math.round(num(S[k]))));S.hp=clamp(S.hp||1,1,S.maxHp||100);S.energy=clamp(S.energy||0,0,S.maxEnergy||10);
+}
+function billChance(b){let support=(S.factions?.[b.bloc]||0)/12+(S.rhetoric||0)+(S.charisma||0)/2,need=b.diff+8;return clamp(Math.round((support+6.5-need)*8+50),5,95)}
+function lawCard(b){
+ let done=S.passed.includes(b.name),critical=b.name==='Constitutional Settlement'||(story[S.storyIndex]?.goal||'').includes(b.name);
+ return `<div class="v502-law ${critical?'critical':''} ${done?'done':''}"><h3>${b.name}</h3><div class="small">${b.text}</div><div class="v502-status"><span>${b.bloc}</span><span>${b.cost} influence</span><span>2 energy</span><span>${billChance(b)}% estimate</span>${critical?'<span>story law</span>':''}</div><button class="btn primary" ${done?'disabled':''} onclick="propose('${jsq(b.name)}')">${done?'Passed':'Propose Bill'}</button></div>`;
+}
+function legislationPanel(){
+ normalize502();let remaining=bills.filter(b=>!S.passed.includes(b.name)),critical=bills.filter(b=>b.name==='Constitutional Settlement'||(story[S.storyIndex]?.goal||'').includes(b.name));
+ let pinned=critical.filter(b=>!S.passed.includes(b.name)),rest=remaining.filter(b=>!pinned.includes(b));
+ return `<div class="v502-legislation"><h2>Major Legislation</h2><div class="v502-note"><b>Story-critical bills are pinned here.</b><div class="small">If a quest asks for a named law, propose it from this panel. Failed bills stay available for another attempt when you have energy and influence.</div></div><div class="v502-law-grid">${[...pinned,...rest].map(lawCard).join('')||'<div class="small">All major Senate bills have passed.</div>'}</div></div>`;
+}
+function patchSenate(){
+ let view=document.getElementById('view');if(!view||currentTab!=='Senate'||view.querySelector('.v502-legislation'))return;
+ view.insertAdjacentHTML('beforeend',legislationPanel());
+}
+function recoverStory(){
+ if(!S)return;let moved=false;
+ while(S.storyIndex<story.length&&story[S.storyIndex]?.check?.(S)){story[S.storyIndex].reward(S);addLog(`<span class="good-text">Chapter completed: ${story[S.storyIndex].title}.</span>`);S.storyIndex++;moved=true}
+ if(moved&&S.storyIndex>=story.length&&!S.flags.victory){S.flags.victory=true;if(typeof ending==='function')ending()}
+}
+const oldCheckStory=window.checkStory;window.checkStory=function(){normalize502();recoverStory()};try{checkStory=window.checkStory}catch(e){}
+const oldRenderView502=window.renderView;window.renderView=function(){normalize502();oldRenderView502();requestAnimationFrame(()=>{normalize502();patchSenate();fixTitle()})};try{renderView=window.renderView}catch(e){}
+const oldRender502=window.render;window.render=function(){normalize502();let out=oldRender502();normalize502();recoverStory();normalize502();requestAnimationFrame(()=>{normalize502();patchSenate();fixTitle()});return out};try{render=window.render}catch(e){}
+const oldPropose502=window.propose;window.propose=function(name){normalize502();oldPropose502(name);normalize502();recoverStory();normalize502();render()};try{propose=window.propose}catch(e){}
+const oldLoad502=window.loadGame;window.loadGame=function(){oldLoad502();setTimeout(()=>{normalize502();render();toast('Save repaired for Version 5.0.3.')},0)};try{loadGame=window.loadGame}catch(e){}
+function boot(){if(typeof S!=='undefined'&&S){normalize502();render()}fixTitle()}
 addEventListener('DOMContentLoaded',boot);if(document.readyState!=='loading')setTimeout(boot,0);
 })();
 </script>

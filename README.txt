@@ -32,3 +32,7 @@ Version 4.8 vastly expands gameplay complexity with dynamic imperial crises, dai
 Version 5.0 overhauls the RPG core with character archetypes, perk points, a perk tree, renown, reputation axes, quest contracts, explorable districts, usable inventory items, wounds, tactical combat choices, companion party roles, RPG rewards, and cross-system quest progression.
 
 Version 5.0.1 is a balance pass only: it reduces runaway money, influence, intel, perk-point and project progression, closes a rival-handling exploit, slows daily snowball effects, and makes crisis, quest, exploration, companion and combat rewards more proportional to their costs and risks.
+
+Version 5.0.2 fixes progression blockers and save-state edge cases. Story-critical Senate bills, including Constitutional Settlement, are now pinned in a Major Legislation panel, failed bills remain retryable, completed story chapters recover across old saves, and migrated saves are normalized before every render.
+
+Version 5.0.3 fixes additional interaction blockers and migration edge cases. The UI cost overlay now understands intelligence and imperial favor costs for dynamic crisis and intrigue actions, and save repair now clamps world, faction, office, election, v48 and v5 RPG state before every render.
